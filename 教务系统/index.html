@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="_shell.css">
+  <title>首页 - 高校教务系统</title>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- ECharts -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+/* ================================================================
+   DESIGN TOKENS
+   ================================================================ */
+:root {
+  /* Primary */
+  --color-primary-50:  #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+
+  /* Accent */
+  --color-accent-50:  #FFFBEB;
+  --color-accent-100: #FEF3C7;
+  --color-accent-200: #FDE68A;
+  --color-accent-300: #FCD34D;
+  --color-accent-400: #FBBF24;
+  --color-accent-500: #F59E0B;
+  --color-accent-600: #D97706;
+
+  /* Neutral */
+  --color-neutral-50:  #F8FAFC;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
+
+  /* Semantic */
+  --color-success-500: #10B981;
+  --color-success-100: #D1FAE5;
+  --color-warning-500: #F59E0B;
+  --color-warning-100: #FEF3C7;
+  --color-error-500:   #EF4444;
+  --color-error-100:   #FEE2E2;
+  --color-info-500:    #3B82F6;
+  --color-info-100:    #DBEAFE;
+
+  /* Typography */
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-display:  2rem;
+  --text-h1:       1.5rem;
+  --text-h2:       1.25rem;
+  --text-h3:       1.125rem;
+  --text-subtitle: 1rem;
+  --text-body:     0.9375rem;
+  --text-body-s:   0.875rem;
+  --text-caption:  0.75rem;
+  --text-overline: 0.6875rem;
+
+  /* Spacing */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card:
+    0 1px 2px  rgba(15, 23, 42, 0.04),
+    0 2px 8px  rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(15, 23, 42, 0.02);
+  --shadow-card-hover:
+    0 2px 4px  rgba(15, 23, 42, 0.06),
+    0 8px 24px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(59, 130, 246, 0.08);
+
+  /* Easing */
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Durations */
+  --duration-fast:   150ms;
+  --duration-normal: 250ms;
+  --duration-slow:   350ms;
+
+  /* Layout */
+  --topbar-height: 56px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 64px;
+  --right-panel-width: 320px;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-neutral-50);
+  color: var(--color-neutral-800);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--duration-normal) var(--ease-out),
+              color var(--duration-normal) var(--ease-out);
+  animation: pageIn 0.3s ease-out;
+}
+@keyframes pageIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+svg { display: block; }
+
+/* ================================================================
+   TOP NAVIGATION BAR
+   ================================================================ */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-5);
+  z-index: 100;
+  transition: background-color var(--duration-normal) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* Hamburger (mobile/tablet) */
+.hamburger {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-neutral-600);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.hamburger:hover { background: var(--color-neutral-100); color: var(--color-neutral-800); }
+
+/* Logo */
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body);
+  font-weight: 700;
+  color: var(--color-neutral-900);
+  white-space: nowrap;
+}
+.topbar-logo .logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--color-primary-500), #7C3AED);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-caption);
+  color: var(--color-neutral-400);
+  white-space: nowrap;
+}
+.breadcrumb .current {
+  color: var(--color-neutral-600);
+  font-weight: 500;
+}
+
+/* Search */
+.topbar-search {
+  position: relative;
+  width: 280px;
+}
+.topbar-search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--space-4) 0 38px;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-s);
+  color: var(--color-neutral-800);
+  background: var(--color-neutral-100);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.topbar-search input::placeholder { color: var(--color-neutral-400); }
+.topbar-search input:hover { background: var(--color-neutral-200); }
+.topbar-search input:focus {
+  background: #FFFFFF;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.10);
+}
+.topbar-search .search-icon {
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: var(--color-neutral-400);
+  pointer-events: none;
+}
+
+/* Topbar right */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.topbar-btn {
+  width: 36px; height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-neutral-500);
+  position: relative;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.topbar-btn:hover { background: var(--color-neutral-100); color: var(--color-neutral-800); }
+.topbar-btn svg { width: 20px; height: 20px; }
+
+/* Notification badge */
+.notification-badge {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 8px; height: 8px;
+  background: var(--color-error-500);
+  border-radius: 50%;
+  border: 1.5px solid #FFFFFF;
+}
+.notification-count {
+  position: absolute;
+  top: 2px; right: 2px;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  background: var(--color-error-500);
+  color: #FFF;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* User avatar */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  border: none;
+  background: none;
+  color: var(--color-neutral-800);
+  font-family: var(--font-sans);
+}
+.user-menu:hover { background: var(--color-neutral-100); }
+.user-avatar {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--color-primary-400), var(--color-primary-600));
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFF;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.user-name {
+  font-size: var(--text-body-s);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ================================================================
+   SIDEBAR
+   ================================================================ */
+.sidebar {
+  position: fixed;
+  top: var(--topbar-height);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: #FFFFFF;
+  border-right: 1px solid var(--color-neutral-200);
+  display: flex;
+  flex-direction: column;
+  z-index: 90;
+  transition: width var(--duration-slow) var(--ease-in-out),
+              background-color var(--duration-normal) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out);
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed);
+}
+
+/* Sidebar nav */
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-s);
+  font-weight: 500;
+  color: var(--color-neutral-600);
+  transition: all var(--duration-fast) var(--ease-out);
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-sans);
+  position: relative;
+}
+.nav-item svg {
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+}
+.nav-item:hover {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-800);
+}
+.nav-item.active {
+  background: var(--color-primary-50);
+  color: var(--color-primary-600);
+  box-shadow: inset 3px 0 0 var(--color-primary-500);
+}
+.nav-item .badge {
+  margin-left: auto;
+  min-width: 20px; height: 20px;
+  padding: 0 6px;
+  background: var(--color-error-500);
+  color: #FFF;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.nav-divider {
+  height: 1px;
+  background: var(--color-neutral-200);
+  margin: var(--space-2) var(--space-3);
+  transition: background-color var(--duration-normal) var(--ease-out);
+}
+
+/* Sidebar footer — collapse toggle */
+.sidebar-footer {
+  padding: var(--space-3);
+  border-top: 1px solid var(--color-neutral-200);
+  transition: border-color var(--duration-normal) var(--ease-out);
+}
+.collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 10px var(--space-3);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-s);
+  font-weight: 500;
+  color: var(--color-neutral-500);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.collapse-btn:hover { background: var(--color-neutral-100); color: var(--color-neutral-700); }
+.collapse-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+/* ================================================================
+   MAIN CONTENT AREA
+   ================================================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--topbar-height);
+  padding: var(--space-6);
+  min-height: calc(100vh - var(--topbar-height));
+  transition: margin-left var(--duration-slow) var(--ease-in-out);
+  display: flex;
+  gap: var(--space-6);
+}
+
+.sidebar.collapsed ~ .main-content {
+  margin-left: var(--sidebar-collapsed);
+}
+
+/* Content primary */
+.content-primary {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ================================================================
+   RIGHT PANEL
+   ================================================================ */
+.right-panel {
+  width: var(--right-panel-width);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.panel-card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+.panel-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.panel-card h3 {
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: var(--color-neutral-800);
+  margin-bottom: var(--space-4);
+}
+
+/* ================================================================
+   WELCOME BANNER
+   ================================================================ */
+.welcome-banner {
+  background: linear-gradient(135deg, var(--color-primary-500), #7C3AED);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-8);
+  color: #FFFFFF;
+  margin-bottom: var(--space-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.25);
+}
+.welcome-banner::after {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.welcome-banner .greeting {
+  font-size: var(--text-h2);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+  position: relative;
+  z-index: 1;
+}
+.welcome-banner .meta {
+  font-size: var(--text-body-s);
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.welcome-banner .meta span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* ================================================================
+   BENTO GRID
+   ================================================================ */
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+/* ================================================================
+   CARDS
+   ================================================================ */
+.card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+  transition: all var(--duration-normal) var(--ease-out);
+  cursor: pointer;
+  overflow: hidden;
+}
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-primary-200);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.card-header h3 {
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: var(--color-neutral-800);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.card-header h3 svg { width: 18px; height: 18px; color: var(--color-primary-500); }
+.card-header .card-link {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-primary-500);
+  transition: color var(--duration-fast);
+}
+.card-header .card-link:hover { color: var(--color-primary-600); }
+
+/* Grid placements */
+.card--schedule  { grid-column: 1 / 4; grid-row: 1 / 3; }
+.card--exam      { grid-column: 4 / 5; grid-row: 1 / 2; }
+.card--notif     { grid-column: 4 / 5; grid-row: 2 / 3; }
+.card--credits   { grid-column: 1 / 3; grid-row: 3 / 4; }
+.card--shortcuts { grid-column: 3 / 5; grid-row: 3 / 4; }
+.card--gpa       { grid-column: 1 / 5; grid-row: 4 / 5; }
+
+/* ================================================================
+   CARD: TODAY'S SCHEDULE (featured)
+   ================================================================ */
+.card--schedule {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, #FFFFFF 0%, var(--color-neutral-50) 100%);
+}
+
+.current-course {
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
+  border-left: 4px solid var(--color-primary-500);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+.current-course .live-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: var(--color-primary-600);
+  margin-bottom: var(--space-2);
+}
+.live-dot .pulse {
+  width: 8px; height: 8px;
+  background: var(--color-error-500);
+  border-radius: 50%;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(1.6); }
+}
+.current-course .course-name {
+  font-size: var(--text-h3);
+  font-weight: 700;
+  color: var(--color-neutral-900);
+  margin-bottom: var(--space-1);
+}
+.current-course .course-meta {
+  font-size: var(--text-body-s);
+  color: var(--color-neutral-500);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.current-course .course-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.current-course .course-meta svg { width: 14px; height: 14px; }
+.current-course .progress-bar-wrap {
+  margin-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.current-course .progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--color-primary-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.current-course .progress-bar-fill {
+  height: 100%;
+  background: var(--color-primary-500);
+  border-radius: var(--radius-full);
+  transition: width 60s linear;
+}
+.current-course .progress-text {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-primary-600);
+  white-space: nowrap;
+}
+
+.next-courses { display: flex; flex-direction: column; gap: var(--space-2); }
+.next-course-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.next-course-item:hover { background: var(--color-neutral-50); }
+.next-course-item .time {
+  font-size: var(--text-body-s);
+  font-weight: 600;
+  color: var(--color-neutral-600);
+  min-width: 100px;
+}
+.next-course-item .info {
+  flex: 1;
+  font-size: var(--text-body-s);
+  color: var(--color-neutral-800);
+}
+.next-course-item .info strong { font-weight: 600; }
+.next-course-item .info span { color: var(--color-neutral-500); font-size: var(--text-caption); }
+.next-course-item .room {
+  font-size: var(--text-caption);
+  color: var(--color-neutral-400);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.next-course-item .room svg { width: 12px; height: 12px; }
+
+.schedule-footer {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-neutral-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-caption);
+  color: var(--color-neutral-500);
+}
+
+/* ================================================================
+   CARD: EXAM COUNTDOWN
+   ================================================================ */
+.card--exam { text-align: center; }
+
+.exam-info .exam-name {
+  font-size: var(--text-body);
+  font-weight: 700;
+  color: var(--color-neutral-800);
+  margin-bottom: var(--space-3);
+  line-height: 1.3;
+}
+.exam-info .exam-date {
+  font-size: var(--text-body-s);
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-1);
+}
+.exam-info .exam-time {
+  font-size: var(--text-caption);
+  color: var(--color-neutral-400);
+  margin-bottom: var(--space-4);
+}
+.days-left {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px; height: 64px;
+  background: var(--color-warning-100);
+  border-radius: 50%;
+  margin-bottom: var(--space-2);
+}
+.days-left .number {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-accent-600);
+  line-height: 1;
+}
+.days-left .unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-accent-600);
+  position: absolute;
+  margin-top: 22px;
+}
+.days-left-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+.days-label {
+  font-size: var(--text-caption);
+  color: var(--color-neutral-500);
+}
+.exam-progress {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-neutral-100);
+}
+.exam-progress .bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-caption);
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-1);
+}
+.exam-progress .bar {
+  height: 6px;
+  background: var(--color-neutral-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.exam-progress .bar-fill {
+  height: 100%;
+  background: var(--color-accent-500);
+  border-radius: var(--radius-full);
+  width: 60%;
+}
+
+/* ================================================================
+   CARD: NOTIFICATIONS
+   ================================================================ */
+.notif-list { display: flex; flex-direction: column; gap: var(--space-2); }
+.notif-item {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+  cursor: pointer;
+  position: relative;
+}
+.notif-item:hover { background: var(--color-neutral-50); }
+.notif-item.unread { background: var(--color-primary-50); }
+.notif-item.unread::before {
+  content: '';
+  position: absolute;
+  left: -1px; top: 50%;
+  transform: translateY(-50%);
+  width: 5px; height: 5px;
+  background: var(--color-error-500);
+  border-radius: 50%;
+}
+.notif-item .notif-title {
+  font-size: var(--text-body-s);
+  font-weight: 500;
+  color: var(--color-neutral-800);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.notif-item .notif-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--color-neutral-400);
+}
+.notif-tag {
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.notif-tag--jiaowu  { background: var(--color-primary-100); color: var(--color-primary-600); }
+.notif-tag--pingjiao{ background: var(--color-success-100); color: var(--color-success-500); }
+.notif-tag--xuanke  { background: var(--color-warning-100); color: var(--color-accent-600); }
+
+/* ================================================================
+   CARD: CREDIT PROGRESS
+   ================================================================ */
+.card--credits {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.credit-chart-wrap {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.credit-detail { flex: 1; }
+.credit-detail .big-number {
+  font-size: var(--text-display);
+  font-weight: 700;
+  color: var(--color-primary-600);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+.credit-detail .big-number small {
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--color-neutral-400);
+}
+.credit-detail .sub-text {
+  font-size: var(--text-body-s);
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-4);
+}
+
+.credit-category { display: flex; flex-direction: column; gap: var(--space-2); }
+.credit-cat-item { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); }
+.credit-cat-item .cat-label { width: 60px; color: var(--color-neutral-500); flex-shrink: 0; }
+.credit-cat-item .cat-bar {
+  flex: 1; height: 6px;
+  background: var(--color-neutral-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.credit-cat-item .cat-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+}
+.cat-bar-fill--tongshi  { background: var(--color-primary-500); }
+.cat-bar-fill--zhuanye { background: var(--color-primary-600); }
+.cat-bar-fill--xuanxiu { background: var(--color-accent-500); }
+.credit-cat-item .cat-num {
+  width: 50px; text-align: right;
+  font-weight: 500; color: var(--color-neutral-700);
+  flex-shrink: 0;
+}
+.credit-cat-item .cat-status {
+  width: 16px; text-align: center;
+  font-size: 10px; flex-shrink: 0;
+}
+
+/* ================================================================
+   CARD: QUICK ACTIONS
+   ================================================================ */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+}
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-2);
+  background: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  font-family: var(--font-sans);
+  color: var(--color-neutral-700);
+}
+.quick-action-btn:hover {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary-200);
+  color: var(--color-primary-600);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59,130,246,0.12);
+}
+.quick-action-btn svg { width: 24px; height: 24px; }
+.quick-action-btn span {
+  font-size: var(--text-caption);
+  font-weight: 500;
+}
+
+/* ================================================================
+   CARD: GPA TREND
+   ================================================================ */
+.gpa-chart-wrap {
+  width: 100%;
+  height: 240px;
+}
+
+/* ================================================================
+   RIGHT PANEL: ABILITY RADAR
+   ================================================================ */
+.radar-chart-wrap {
+  width: 100%;
+  height: 220px;
+}
+
+/* ================================================================
+   RIGHT PANEL: TODO LIST
+   ================================================================ */
+.todo-list { display: flex; flex-direction: column; gap: var(--space-2); }
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  font-size: var(--text-body-s);
+  color: var(--color-neutral-700);
+  cursor: pointer;
+}
+.todo-item .todo-check {
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--color-neutral-300);
+  border-radius: 5px;
+  background: #FFFFFF;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all var(--duration-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.todo-item.done .todo-check {
+  background: var(--color-success-500);
+  border-color: var(--color-success-500);
+}
+.todo-item.done .todo-check::after {
+  content: '';
+  width: 4px; height: 7px;
+  border: solid #FFF;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) translateY(-1px);
+}
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  color: var(--color-neutral-400);
+}
+.todo-item .todo-deadline {
+  font-size: var(--text-caption);
+  color: var(--color-neutral-400);
+  margin-top: 1px;
+}
+.todo-item .todo-deadline.urgent { color: var(--color-error-500); font-weight: 500; }
+.todo-add {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) 0;
+  font-size: var(--text-caption);
+  color: var(--color-neutral-400);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--font-sans);
+  transition: color var(--duration-fast);
+}
+.todo-add:hover { color: var(--color-primary-500); }
+.todo-add svg { width: 16px; height: 16px; }
+
+/* ================================================================
+   RIGHT PANEL: MINI CALENDAR
+   ================================================================ */
+.mini-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+.mini-calendar .day-header {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-neutral-400);
+  padding: var(--space-1) 0;
+  text-transform: uppercase;
+}
+.mini-calendar .day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-neutral-600);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+.mini-calendar .day-cell:hover { background: var(--color-neutral-100); }
+.mini-calendar .day-cell.today {
+  background: var(--color-primary-500);
+  color: #FFF;
+  font-weight: 700;
+}
+.mini-calendar .day-cell.exam-day {
+  color: var(--color-error-500);
+  font-weight: 600;
+  position: relative;
+}
+.mini-calendar .day-cell.exam-day::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 3px; height: 3px;
+  background: var(--color-error-500);
+  border-radius: 50%;
+}
+.mini-calendar .day-cell.other-month { color: var(--color-neutral-300); }
+
+/* ================================================================
+   MOBILE OVERLAY
+   ================================================================ */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  z-index: 85;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+.sidebar-overlay.show {
+  display: block;
+  opacity: 1;
+}
+
+/* ================================================================
+   DARK MODE
+   ================================================================ */
+body.dark {
+  --color-neutral-50:  #0F172A;
+  --color-neutral-100: #1E293B;
+  --color-neutral-200: #334155;
+  --color-neutral-300: #475569;
+  --color-neutral-400: #64748B;
+  --color-neutral-500: #94A3B8;
+  --color-neutral-600: #CBD5E1;
+  --color-neutral-700: #E2E8F0;
+  --color-neutral-800: #F1F5F9;
+  --color-neutral-900: #F8FAFC;
+
+  --color-primary-50:  #1E3A5F;
+  --color-primary-100: #1E40AF;
+  --color-primary-200: #1D4ED8;
+  --color-primary-300: #2563EB;
+  --color-primary-500: #60A5FA;
+  --color-primary-600: #93C5FD;
+
+  --shadow-card:
+    0 1px 2px rgba(0,0,0,0.3),
+    0 2px 8px rgba(0,0,0,0.2);
+  --shadow-card-hover:
+    0 2px 4px rgba(0,0,0,0.4),
+    0 8px 24px rgba(0,0,0,0.3),
+    0 0 0 1px rgba(96,165,250,0.15);
+}
+
+body.dark .topbar {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+}
+body.dark .sidebar,
+body.dark .card,
+body.dark .panel-card {
+  background: #1E293B;
+}
+body.dark .current-course {
+  background: rgba(59,130,246,0.12);
+  border-color: rgba(59,130,246,0.25);
+}
+body.dark .next-course-item:hover { background: rgba(255,255,255,0.03); }
+body.dark .topbar-search input {
+  background: rgba(255,255,255,0.06);
+  color: var(--color-neutral-800);
+}
+body.dark .topbar-search input:focus { background: #1E293B; }
+body.dark .quick-action-btn { background: rgba(255,255,255,0.04); }
+body.dark .card--schedule {
+  background: linear-gradient(180deg, #1E293B 0%, rgba(30,41,59,0.6) 100%);
+}
+body.dark .welcome-banner {
+  box-shadow: 0 4px 24px rgba(96,165,250,0.2);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 1280px) {
+  .right-panel { display: none; }
+  .bento-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .card--schedule  { grid-column: 1 / 4; grid-row: 1 / 2; }
+  .card--exam      { grid-column: 1 / 2; grid-row: 2 / 3; }
+  .card--notif     { grid-column: 2 / 4; grid-row: 2 / 3; }
+  .card--credits   { grid-column: 1 / 3; grid-row: 3 / 4; }
+  .card--shortcuts { grid-column: 3 / 4; grid-row: 3 / 4; }
+  .card--gpa       { grid-column: 1 / 4; grid-row: 4 / 5; }
+  .quick-actions { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 1024px) {
+  .sidebar { width: var(--sidebar-collapsed); }
+  .sidebar .nav-item span,
+  .sidebar .nav-item .badge,
+  .sidebar .nav-divider,
+  .sidebar .collapse-btn span,
+  .sidebar .collapse-btn svg { display: none; }
+  .sidebar:not(.mobile-open) .collapse-btn { display: none; }
+  .sidebar .nav-item { justify-content: center; padding: 10px; }
+  .main-content { margin-left: var(--sidebar-collapsed); }
+  .sidebar:not(.mobile-open) ~ .main-content { margin-left: var(--sidebar-collapsed); }
+  .topbar-search { width: 200px; }
+  .hamburger { display: flex; }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: var(--sidebar-width);
+    z-index: 95;
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar.mobile-open .nav-item { justify-content: flex-start; padding: 10px var(--space-3); }
+  .sidebar.mobile-open .nav-item span,
+  .sidebar.mobile-open .nav-item .badge,
+  .sidebar.mobile-open .collapse-btn span { display: inline; }
+  .sidebar.mobile-open .nav-divider { display: block; }
+  .main-content { margin-left: 0 !important; }
+  .topbar-search { display: none; }
+  .user-name { display: none; }
+  .bento-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+  .card--schedule  { grid-column: 1 / 3; grid-row: auto; }
+  .card--exam      { grid-column: 1 / 2; grid-row: auto; }
+  .card--notif     { grid-column: 2 / 3; grid-row: auto; }
+  .card--credits   { grid-column: 1 / 3; grid-row: auto; flex-direction: column; }
+  .card--shortcuts { grid-column: 1 / 3; grid-row: auto; }
+  .card--gpa       { grid-column: 1 / 3; grid-row: auto; }
+  .quick-actions { grid-template-columns: 1fr 1fr 1fr; }
+  .welcome-banner { padding: var(--space-4) var(--space-5); }
+  .welcome-banner .greeting { font-size: var(--text-h3); }
+  .card { padding: var(--space-4); }
+}
+
+@media (max-width: 480px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .card--schedule,
+  .card--exam,
+  .card--notif,
+  .card--credits,
+  .card--shortcuts,
+  .card--gpa { grid-column: 1 / 2; grid-row: auto; }
+  .main-content { padding: var(--space-3); }
+  .quick-actions { grid-template-columns: 1fr 1fr 1fr; gap: var(--space-2); }
+  .quick-action-btn { padding: var(--space-3) var(--space-1); }
+  .credit-chart-wrap { width: 100px; height: 100px; }
+}
+
+
+.user-menu-wrap{position:relative;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:210px;background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);box-shadow:0 10px 40px rgba(15,23,42,0.14);padding:var(--space-2);z-index:200;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s var(--ease-out);}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);cursor:pointer;transition:all var(--duration-fast);border:none;background:none;width:100%;text-align:left;font-family:var(--font-sans);}
+.dropdown-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.dropdown-item svg{width:18px;height:18px;color:var(--color-neutral-400);flex-shrink:0;}
+.dropdown-item.danger{color:var(--color-error-500);}.dropdown-item.danger:hover{background:var(--color-error-100);}
+.dropdown-divider{height:1px;background:var(--color-neutral-100);margin:var(--space-1) 0;}
+body.dark .user-dropdown{background:#1E293B;border-color:var(--color-neutral-200);}
+body.dark .dropdown-item:hover{background:rgba(255,255,255,.06);}
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     TOP NAVIGATION BAR
+     ================================================================ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="topbar-logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/>
+        </svg>
+      </div>
+      教务系统
+    </div>
+    <nav class="breadcrumb">
+      <span>首页</span>
+      <span>/</span>
+      <span class="current">仪表盘</span>
+    </nav>
+  </div>
+
+  <div class="topbar-search">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" placeholder="搜索课程、通知… (Ctrl+K)" id="globalSearch">
+  </div>
+
+  <div class="topbar-right">
+    <button class="topbar-btn" id="darkModeToggle" title="切换暗黑模式">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" id="darkIcon">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+
+    <a href="notifications.html" class="topbar-btn" style="position:relative;" title="通知">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="notification-count" id="topNotifCount" style="top:4px;right:4px;">3</span>
+    </a>
+
+    <div class="user-menu-wrap"><button class="user-menu" id="userMenuBtn">
+      <div class="user-avatar">李</div>
+      <span class="user-name">李小宇</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="personal.html" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人信息</a>
+        <a href="#" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a href="login.html" class="dropdown-item danger"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================================================================
+     SIDEBAR
+     ================================================================ -->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <button class="nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      <span>首页仪表盘</span>
+    </button>
+    <a href="schedule.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>
+      </svg>
+      <span>课表</span>
+    </a>
+    <a href="course-selection.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+      <span>选课中心</span>
+    </a>
+    <a href="grades.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span>成绩查询</span>
+    </a>
+    <a href="notifications.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span>校园通知</span>
+      <span class="badge" id="sidebarBadge">3</span>
+    </a>
+    <a href="exams.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>
+      </svg>
+      <span>考试安排</span>
+    </a>
+
+    <div class="nav-divider"></div>
+
+    <a href="training.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/>
+      </svg>
+      <span>培养方案</span>
+    </a>
+    <a href="payment.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      <span>缴费查询</span>
+    </a>
+    <a href="resources.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <span>教学资源</span>
+    </a>
+    <a href="evaluation.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <span>教学评价</span>
+    </a>
+
+    <div class="nav-divider"></div>
+
+    <a href="settings.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span>设置</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="collapse-btn" id="collapseBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span>折叠菜单</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ================================================================
+     MAIN CONTENT
+     ================================================================ -->
+<div class="main-content">
+
+  <!-- Content Primary -->
+  <div class="content-primary">
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <div class="greeting"><span id="greetingEmoji">👋</span> <span id="greetingWord">下午好</span>，<span id="greetingName">李小宇</span></div>
+      <div class="meta">
+        <span>📅 2026年6月12日 星期五</span>
+        <span>📖 第16教学周</span>
+        <span>☀️ 晴天 28°C</span>
+        <span>🎯 距暑假还有 22 天</span>
+      </div>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="bento-grid">
+
+      <!-- ===== TODAY'S SCHEDULE (spans 3 cols × 2 rows) ===== -->
+      <div class="card card--schedule">
+        <div class="card-header">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            今日课表
+          </h3>
+          <a href="schedule.html" class="card-link">完整课表 →</a>
+        </div>
+
+        <!-- Current course (dynamic) -->
+        <div id="homeCurrentCourse"></div>
+
+        <!-- Next courses (dynamic) -->
+        <div class="next-courses" id="homeNextCourses"></div>
+
+        <div class="schedule-footer" id="homeScheduleFooter">
+          <span>📌 加载中…</span>
+        </div>
+      </div>
+
+      <!-- ===== EXAM COUNTDOWN (1×1) ===== -->
+      <div class="card card--exam">
+        <div class="card-header">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            考试倒计时
+          </h3>
+        </div>
+        <div class="exam-info">
+          <div class="exam-name">大学英语<br>(CET-6)</div>
+          <div class="exam-date">📅 2026-06-15 (周一)</div>
+          <div class="exam-time">🕐 09:00 - 11:30</div>
+          <div class="days-left-wrap">
+            <div class="days-left">
+              <span class="number">3</span>
+            </div>
+          </div>
+          <div class="days-label">天</div>
+          <div class="exam-progress">
+            <div class="bar-label">
+              <span>已考 3/5 门</span><span>60%</span>
+            </div>
+            <div class="bar"><div class="bar-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== NOTIFICATIONS (1×1) ===== -->
+      <div class="card card--notif" onclick="location.href='notifications.html'">
+        <div class="card-header">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            最新通知
+          </h3>
+          <a href="notifications.html" class="card-link">全部 →</a>
+        </div>
+        <div class="notif-list" id="homeNotifList">
+          <div class="notif-item unread" data-nid="1">
+            <div class="notif-title">关于端午节放假及调课安排的通知</div>
+            <div class="notif-meta">
+              <span class="notif-tag notif-tag--jiaowu">教务</span>
+              <span>2小时前</span>
+            </div>
+          </div>
+          <div class="notif-item unread" data-nid="3">
+            <div class="notif-title">期末课程评教已开放，请及时完成</div>
+            <div class="notif-meta">
+              <span class="notif-tag notif-tag--pingjiao">评教</span>
+              <span>昨天</span>
+            </div>
+          </div>
+          <div class="notif-item" data-nid="4">
+            <div class="notif-title">2026秋季选课结果已公布</div>
+            <div class="notif-meta">
+              <span class="notif-tag notif-tag--xuanke">选课</span>
+              <span>3天前</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CREDIT PROGRESS (2×1) ===== -->
+      <div class="card card--credits" onclick="location.href='training.html'">
+        <div class="credit-chart-wrap" id="creditRing"><div class="skeleton" style="width:140px;height:140px;border-radius:50%;margin:0 auto;"></div></div>
+        <div class="credit-detail">
+          <div class="big-number">
+            118<small>/164</small>
+          </div>
+          <div class="sub-text">已修学分 · 达成率 72%</div>
+          <div class="credit-category">
+            <div class="credit-cat-item">
+              <span class="cat-label">通识必修</span>
+              <div class="cat-bar"><div class="cat-bar-fill cat-bar-fill--tongshi" style="width:90%"></div></div>
+              <span class="cat-num">38/42</span>
+              <span class="cat-status">✅</span>
+            </div>
+            <div class="credit-cat-item">
+              <span class="cat-label">专业必修</span>
+              <div class="cat-bar"><div class="cat-bar-fill cat-bar-fill--zhuanye" style="width:72%"></div></div>
+              <span class="cat-num">52/72</span>
+              <span class="cat-status">⏳</span>
+            </div>
+            <div class="credit-cat-item">
+              <span class="cat-label">专业选修</span>
+              <div class="cat-bar"><div class="cat-bar-fill cat-bar-fill--xuanxiu" style="width:60%"></div></div>
+              <span class="cat-num">18/30</span>
+              <span class="cat-status">⏳</span>
+            </div>
+            <div class="credit-cat-item">
+              <span class="cat-label">通识选修</span>
+              <div class="cat-bar"><div class="cat-bar-fill cat-bar-fill--xuanxiu" style="width:50%"></div></div>
+              <span class="cat-num">10/20</span>
+              <span class="cat-status">⏳</span>
+            </div>
+          </div>
+          <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-neutral-400);">
+            📌 还差 46 学分 · 预计再修 2 学期
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== QUICK ACTIONS (2×1) ===== -->
+      <div class="card card--shortcuts">
+        <div class="card-header">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            快捷操作
+          </h3>
+        </div>
+        <div class="quick-actions">
+          <button class="quick-action-btn" onclick="location.href='course-selection.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+            <span>选课</span>
+          </button>
+          <button class="quick-action-btn" onclick="location.href='grades.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            <span>成绩</span>
+          </button>
+          <button class="quick-action-btn" onclick="location.href='evaluation.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+            <span>评教</span>
+          </button>
+          <button class="quick-action-btn" onclick="location.href='exams.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>
+            </svg>
+            <span>考试</span>
+          </button>
+          <button class="quick-action-btn" onclick="location.href='training.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/>
+            </svg>
+            <span>毕业</span>
+          </button>
+          <button class="quick-action-btn" onclick="location.href='settings.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>帮助</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== GPA TREND (full width) ===== -->
+      <div class="card card--gpa" onclick="location.href='grades.html'">
+        <div class="card-header">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            GPA 趋势
+          </h3>
+          <span style="font-size:var(--text-body);font-weight:700;color:var(--color-primary-600);">
+            当前 GPA 3.72
+          </span>
+        </div>
+        <div class="gpa-chart-wrap" id="gpaChart"><div class="skeleton" style="width:100%;height:240px;"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--text-caption);color:var(--color-neutral-500);margin-top:var(--space-1);">
+          <span>📊 班级排名: 前 18% (15/85)</span>
+          <span style="color:var(--color-success-500);font-weight:600;">↑ 较上期 +0.08</span>
+        </div>
+      </div>
+
+    </div><!-- /bento-grid -->
+
+    <!-- ===== 学业健康报告 ===== -->
+    <div class="card" style="margin-bottom:var(--space-5);padding:var(--space-6);cursor:default;" onclick="event.stopPropagation();">
+      <div class="card-header">
+        <h3>📋 本学期学业健康报告</h3>
+        <span style="font-size:var(--text-caption);color:var(--color-neutral-400);">生成时间：<span id="reportTime"></span></span>
+      </div>
+      <div style="display:flex;gap:var(--space-6);flex-wrap:wrap;align-items:center;">
+        <div id="healthGauge" style="width:180px;height:180px;flex-shrink:0;"><div class="skeleton" style="width:180px;height:180px;border-radius:50%;"></div></div>
+        <div style="flex:1;min-width:250px;font-size:var(--text-body-s);color:var(--color-neutral-600);line-height:2.2;">
+          <div>📊 综合学业评分 <strong style="color:var(--color-primary-600);font-size:var(--text-h3);" id="healthScore">87</strong> 分 — <span style="color:var(--color-success-500);font-weight:600;">良好</span></div>
+          <div>📈 GPA <strong>3.72</strong>，较上学期 <span style="color:var(--color-success-500);">+0.08 ↑</span></div>
+          <div>📖 学分达成 <strong>72%</strong>，正常毕业预期 2028年6月</div>
+          <div>🏆 班级排名 <strong>15/85</strong>（前 18%），稳住即可</div>
+          <div style="margin-top:var(--space-2);padding-top:var(--space-2);border-top:1px solid var(--color-neutral-100);">
+            💡 <strong>建议：</strong>专业选修学分缺口较大（差12学分），下学期建议优先选修。
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-primary -->
+
+  <!-- ================================================================
+       RIGHT PANEL
+       ================================================================ -->
+  <div class="right-panel">
+
+    <!-- Ability Radar -->
+    <div class="panel-card">
+      <h3>🎯 个人能力雷达</h3>
+      <div class="radar-chart-wrap" id="radarChart"></div>
+    </div>
+
+    <!-- Todo List -->
+    <div class="panel-card">
+      <h3>✅ 今日待办</h3>
+      <div class="todo-list">
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div>
+            <div class="todo-text">交数据结构实验报告</div>
+            <div class="todo-deadline urgent">明天 23:59 截止</div>
+          </div>
+        </div>
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div>
+            <div class="todo-text">完成大学英语评教</div>
+            <div class="todo-deadline">还剩 3 天</div>
+          </div>
+        </div>
+        <div class="todo-item done">
+          <div class="todo-check"></div>
+          <div>
+            <div class="todo-text">打印成绩单</div>
+            <div class="todo-deadline">已完成</div>
+          </div>
+        </div>
+      </div>
+      <button class="todo-add">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        添加待办
+      </button>
+    </div>
+
+    <!-- Mini Calendar -->
+    <div class="panel-card">
+      <h3>📅 2026年6月</h3>
+      <div class="mini-calendar">
+        <div class="day-header">一</div><div class="day-header">二</div><div class="day-header">三</div>
+        <div class="day-header">四</div><div class="day-header">五</div><div class="day-header">六</div><div class="day-header">日</div>
+        <!-- June 2026 starts on Monday -->
+        <div class="day-cell">1</div><div class="day-cell">2</div><div class="day-cell">3</div>
+        <div class="day-cell">4</div><div class="day-cell">5</div><div class="day-cell">6</div><div class="day-cell">7</div>
+        <div class="day-cell">8</div><div class="day-cell">9</div><div class="day-cell">10</div>
+        <div class="day-cell">11</div><div class="day-cell today">12</div>
+        <div class="day-cell">13</div><div class="day-cell">14</div>
+        <div class="day-cell exam-day">15</div><div class="day-cell">16</div><div class="day-cell">17</div>
+        <div class="day-cell">18</div><div class="day-cell">19</div><div class="day-cell">20</div>
+        <div class="day-cell exam-day">21</div><div class="day-cell">22</div><div class="day-cell">23</div>
+        <div class="day-cell">24</div><div class="day-cell">25</div><div class="day-cell">26</div>
+        <div class="day-cell">27</div><div class="day-cell">28</div><div class="day-cell">29</div>
+        <div class="day-cell">30</div>
+        <div class="day-cell other-month">1</div><div class="day-cell other-month">2</div>
+        <div class="day-cell other-month">3</div><div class="day-cell other-month">4</div><div class="day-cell other-month">5</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<script>
+/* ================================================================
+   MAIN APPLICATION LOGIC
+   ================================================================ */
+(function() {
+
+  // ---- DOM refs ----
+  const sidebar       = document.getElementById('sidebar');
+  const collapseBtn   = document.getElementById('collapseBtn');
+  const hamburgerBtn  = document.getElementById('hamburgerBtn');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  const darkIcon      = document.getElementById('darkIcon');
+
+  // ---- Sidebar collapse toggle (desktop) ----
+  collapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+    // Trigger ECharts resize after transition
+    setTimeout(resizeAllCharts, 350);
+  });
+
+  // ---- Mobile sidebar toggle ----
+  function openSidebar() {
+    sidebar.classList.add('mobile-open');
+    sidebarOverlay.classList.add('show');
+  }
+  function closeSidebar() {
+    sidebar.classList.remove('mobile-open');
+    sidebarOverlay.classList.remove('show');
+  }
+  hamburgerBtn.addEventListener('click', function() {
+    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+  });
+  sidebarOverlay.addEventListener('click', closeSidebar);
+
+  // ---- Dark mode toggle ----
+  function setDarkMode(isDark) {
+    if (isDark) {
+      document.body.classList.add('dark');
+      darkIcon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark');
+      darkIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+      localStorage.setItem('theme', 'light');
+    }
+    // Update ECharts for dark/light
+    setTimeout(resizeAllCharts, 300);
+  }
+
+  darkModeToggle.addEventListener('click', function() {
+    setDarkMode(!document.body.classList.contains('dark'));
+  });
+
+  // Load saved theme
+  if (localStorage.getItem('theme') === 'dark') {
+    setDarkMode(true);
+  }
+
+  // ---- Keyboard shortcuts ----
+  document.addEventListener('keydown', function(e) {
+    // Ctrl+K → focus search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('globalSearch').focus();
+    }
+    // Ctrl+B → toggle sidebar
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+      e.preventDefault();
+      sidebar.classList.toggle('collapsed');
+      setTimeout(resizeAllCharts, 350);
+    }
+    // Ctrl+D → toggle dark mode
+    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+      e.preventDefault();
+      setDarkMode(!document.body.classList.contains('dark'));
+    }
+  });
+
+  // ---- Todo item toggle ----
+  document.querySelectorAll('.todo-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      this.classList.toggle('done');
+    });
+  });
+
+  // ---- Quick action navigation ----
+  document.querySelectorAll('.quick-action-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var text = this.querySelector('span').textContent;
+      console.log('Navigate to:', text);
+    });
+  });
+
+  // ---- Sidebar nav item clicks ----
+  document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(i) {
+        i.classList.remove('active');
+      });
+      this.classList.add('active');
+      // On mobile, close sidebar after navigation
+      if (window.innerWidth <= 768) {
+        closeSidebar();
+      }
+    });
+  });
+
+  // ---- Homepage dynamic schedule ----
+  var HOME_COURSES = [
+    {name:'数据结构',teacher:'李建国 教授',room:'教三楼 201',day:1,start:10,end:12,period:'3-4节'},
+    {name:'高等数学',teacher:'陈明 副教授',room:'教一楼 201',day:2,start:8,end:9.67,period:'1-2节'},
+    {name:'Python编程',teacher:'赵强 讲师',room:'机房 2',day:3,start:10,end:12,period:'3-4节'},
+    {name:'摄影基础',teacher:'周艺 讲师',room:'教五楼 301',day:4,start:19,end:20.67,period:'9-10节'},
+    {name:'大学英语',teacher:'王芳 副教授',room:'教一楼 503',day:5,start:14,end:15.67,period:'5-6节'},
+    {name:'大学物理实验',teacher:'张伟 讲师',room:'理综楼 B1',day:5,start:16,end:17.67,period:'7-8节'},
+    {name:'思想政治',teacher:'刘红 教授',room:'教二楼 101',day:2,start:16,end:17.67,period:'7-8节'},
+    {name:'数据结构(实验)',teacher:'李建国 教授',room:'教三楼 201',day:3,start:14,end:15.67,period:'5-6节',biweek:2},
+  ];
+
+  function renderHomeSchedule() {
+    var now = new Date();
+    var today = now.getDay(); today = today === 0 ? 7 : today; // Mon=1..Sun=7
+    // Calculate current week number (same logic as schedule.html)
+    var weekBase = new Date(2026,5,8); // Monday of week 16
+    var weekNum = 16 + Math.floor((now - weekBase) / 86400000 / 7);
+    var nowHours = now.getHours() + now.getMinutes()/60;
+
+    var todayCourses = HOME_COURSES.filter(function(c){
+      if (c.day !== today) return false;
+      if (c.biweek && weekNum % 2 !== c.biweek % 2) return false;
+      return true;
+    }).sort(function(a,b){ return a.start - b.start; });
+
+    var current = null, upcoming = [];
+    todayCourses.forEach(function(c){
+      if (nowHours >= c.start && nowHours < c.end) { current = c; }
+      else if (nowHours < c.start) { upcoming.push(c); }
+    });
+
+    // Render current course
+    var ccDiv = document.getElementById('homeCurrentCourse');
+    if (current) {
+      var elapsedPct = Math.round(((nowHours - current.start) / (current.end - current.start)) * 100);
+      var remainMin = Math.max(0, Math.round((current.end - nowHours) * 60));
+      ccDiv.innerHTML = '<div class="current-course">'+
+        '<div class="live-dot"><span class="pulse"></span> 正在进行</div>'+
+        '<div class="course-name">'+current.name+'</div>'+
+        '<div class="course-meta">'+
+          '<span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> '+current.teacher+'</span>'+
+          '<span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '+current.room+'</span>'+
+          '<span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> '+current.start+':00 - '+current.end+':00</span>'+
+        '</div>'+
+        '<div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-bar-fill" style="width:'+elapsedPct+'%;" id="courseProgress"></div></div><span class="progress-text" id="courseTimeRemain">剩余 '+remainMin+' 分钟</span></div>'+
+      '</div>';
+    } else if (upcoming.length > 0) {
+      ccDiv.innerHTML = '<div style="padding:var(--space-4);text-align:center;color:var(--color-neutral-400);font-size:var(--text-body-s);">☕ 现在是课间休息，下一节课 '+upcoming[0].start+':00 开始</div>';
+    } else {
+      ccDiv.innerHTML = '<div style="padding:var(--space-4);text-align:center;color:var(--color-neutral-400);font-size:var(--text-body-s);">✅ 今日课程已全部完成</div>';
+    }
+
+    // Render next courses
+    var ncDiv = document.getElementById('homeNextCourses');
+    if (upcoming.length > 0) {
+      ncDiv.innerHTML = upcoming.map(function(c){
+        var endStr = c.end.toString();
+        if (endStr.indexOf('.') > -1) { var parts = endStr.split('.'); var mins = Math.round(parseInt(parts[1]) * 0.6); endStr = parts[0] + ':' + (mins < 10 ? '0' : '') + mins; }
+        else { endStr = endStr + ':00'; }
+        var startStr = c.start + ':00';
+        return '<div class="next-course-item"><div class="time">'+startStr+'-'+endStr+'</div><div class="info"><strong>'+c.name+'</strong> <span>· '+c.teacher+'</span></div><div class="room"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '+c.room+'</div></div>';
+      }).join('');
+    } else {
+      ncDiv.innerHTML = todayCourses.length > 0 ? '' : '<div style="padding:var(--space-2) 0;text-align:center;color:var(--color-neutral-400);font-size:var(--text-caption);">🎉 今天没有课程安排</div>';
+    }
+
+    // Footer
+    var footer = document.getElementById('homeScheduleFooter');
+    var total = todayCourses.length;
+    if (total === 0) {
+      footer.innerHTML = '<span>🎉 今日无课，好好休息！</span>';
+    } else {
+      var lastEnd = Math.max.apply(null, todayCourses.map(function(c){ return c.end; }));
+      var lastEndStr = Math.floor(lastEnd) + ':' + (lastEnd % 1 > 0 ? '40' : '00');
+      footer.innerHTML = '<span>📌 今日共 '+total+' 节课 · 最后一节 '+lastEndStr+' 下课</span>';
+    }
+  }
+  renderHomeSchedule();
+  setInterval(renderHomeSchedule, 60000);
+
+  // ---- Resize handler ----
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resizeAllCharts, 200);
+  });
+
+  function resizeAllCharts() {
+    if (creditChart) creditChart.resize();
+    if (gpaChartInstance) gpaChartInstance.resize();
+    if (radarChartInstance) radarChartInstance.resize();
+    if (healthGauge) healthGauge.resize();
+  }
+
+  // ================================================================
+  // ECHARTS INITIALIZATION
+  // ================================================================
+
+  var isDark = document.body.classList.contains('dark');
+  var textColor = isDark ? '#CBD5E1' : '#64748B';
+  var axisColor = isDark ? '#334155' : '#E2E8F0';
+
+  // ---- Health Report Gauge ----
+  var healthGauge = echarts.init(document.getElementById('healthGauge'));
+  healthGauge.setOption({
+    series: [{
+      type: 'gauge', startAngle: 210, endAngle: -30, radius: '90%',
+      axisLine: { show: true, lineStyle: { width: 14, color: [[0.6, '#EF4444'], [0.8, '#F59E0B'], [1, '#10B981']] } },
+      axisTick: { show: false }, splitLine: { show: false },
+      axisLabel: { show: false },
+      pointer: { length: '60%', width: 6, itemStyle: { color: '#3B82F6' } },
+      detail: { offsetCenter: [0, 40], formatter: '{value}分', fontSize: 16, fontWeight: 'bold', color: isDark ? '#F1F5F9' : '#1E293B', fontFamily: 'Inter, PingFang SC, sans-serif' },
+      data: [{ value: 87 }]
+    }]
+  });
+  document.getElementById('reportTime').textContent = new Date().toLocaleString('zh-CN');
+
+  // ---- Credit Ring Chart ----
+  var creditChart = echarts.init(document.getElementById('creditRing'));
+  creditChart.setOption({
+    graphic: [
+      {
+        type: 'text',
+        left: 'center', top: 'center',
+        style: {
+          text: '72%',
+          fontSize: 22,
+          fontWeight: 'bold',
+          fontFamily: 'Inter, "PingFang SC", "Microsoft YaHei", sans-serif',
+          fill: isDark ? '#F1F5F9' : '#1E293B',
+          textAlign: 'center', textVerticalAlign: 'middle'
+        }
+      }
+    ],
+    series: [{
+      type: 'pie',
+      radius: ['70%', '88%'],
+      center: ['50%', '50%'],
+      silent: true,
+      label: { show: false },
+      emphasis: { disabled: true },
+      data: [
+        { value: 118, itemStyle: {
+          color: new echarts.graphic.LinearGradient(0,0,1,1,[
+            {offset:0, color:'#3B82F6'},{offset:1, color:'#7C3AED'}
+          ])
+        }},
+        { value: 46, itemStyle: { color: 'transparent' } }
+      ]
+    }]
+  });
+
+  // ---- GPA Trend Chart ----
+  var gpaChartInstance = echarts.init(document.getElementById('gpaChart'));
+  gpaChartInstance.setOption({
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: isDark ? '#1E293B' : '#FFF',
+      borderColor: isDark ? '#334155' : '#E2E8F0',
+      textStyle: { color: isDark ? '#F1F5F9' : '#1E293B', fontSize: 13 }
+    },
+    legend: {
+      bottom: 0,
+      textStyle: { color: textColor, fontSize: 12 },
+      data: ['你的 GPA', '班级均值']
+    },
+    grid: { left: 40, right: 20, top: 20, bottom: 40 },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: ['大一上','大一下','大二上','大二下','大三上','大三下'],
+      axisLine: { lineStyle: { color: axisColor } },
+      axisTick: { show: false },
+      axisLabel: { color: textColor, fontSize: 11 }
+    },
+    yAxis: {
+      type: 'value',
+      min: 2.8,
+      max: 4.0,
+      interval: 0.2,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { lineStyle: { color: axisColor, type: 'dashed' } },
+      axisLabel: { color: textColor, fontSize: 11 }
+    },
+    series: [
+      {
+        name: '你的 GPA',
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        data: [3.28, 3.45, 3.52, 3.64, 3.72, null],
+        lineStyle: { color: '#3B82F6', width: 3 },
+        itemStyle: { color: '#3B82F6' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0,0,0,1,[
+            {offset:0, color:'rgba(59,130,246,0.25)'},
+            {offset:1, color:'rgba(59,130,246,0.02)'}
+          ])
+        }
+      },
+      {
+        name: '班级均值',
+        type: 'line',
+        smooth: true,
+        symbol: 'diamond',
+        symbolSize: 6,
+        data: [3.15, 3.28, 3.32, 3.38, 3.42, null],
+        lineStyle: { color: '#94A3B8', width: 2, type: 'dashed' },
+        itemStyle: { color: '#94A3B8' }
+      },
+      {
+        name: '预估',
+        type: 'line',
+        smooth: true,
+        symbol: 'emptyCircle',
+        symbolSize: 8,
+        data: [null, null, null, null, 3.72, 3.78],
+        lineStyle: { color: '#3B82F6', width: 2, type: 'dotted' },
+        itemStyle: { color: '#3B82F6', borderWidth: 2 },
+        areaStyle: { show: false }
+      }
+    ]
+  });
+
+  // ---- Ability Radar Chart ----
+  var radarChartInstance = echarts.init(document.getElementById('radarChart'));
+  radarChartInstance.setOption({
+    radar: {
+      center: ['50%', '50%'],
+      radius: '65%',
+      indicator: [
+        { name: '编程', max: 100 },
+        { name: '数学', max: 100 },
+        { name: '英语', max: 100 },
+        { name: '通识', max: 100 },
+        { name: '实践', max: 100 },
+        { name: '创新', max: 100 }
+      ],
+      axisName: { color: textColor, fontSize: 11, borderRadius: 3 },
+      splitArea: {
+        areaStyle: { color: [isDark ? 'rgba(59,130,246,0.05)' : 'rgba(59,130,246,0.03)', 'transparent'] }
+      },
+      axisLine: { lineStyle: { color: axisColor } },
+      splitLine: { lineStyle: { color: axisColor } }
+    },
+    series: [{
+      type: 'radar',
+      data: [{
+        value: [88, 72, 68, 75, 82, 65],
+        name: '能力值',
+        areaStyle: { color: 'rgba(59,130,246,0.25)' },
+        lineStyle: { color: '#3B82F6', width: 2 },
+        itemStyle: { color: '#3B82F6' },
+        symbol: 'circle',
+        symbolSize: 6
+      }]
+    }]
+  });
+
+  // ---- Store chart instances globally for resize ----
+  window._creditChart = creditChart;
+  window._gpaChartInstance = gpaChartInstance;
+  window._radarChartInstance = radarChartInstance;
+
+  // ---- Badge persistence across pages ----
+  window.updateBadgeUI = function(count) {
+    var topBadge = document.getElementById('topNotifCount');
+    var sideBadge = document.getElementById('sidebarBadge');
+    [topBadge, sideBadge].forEach(function(el) {
+      if (!el) return;
+      el.textContent = count;
+      el.style.display = count > 0 ? '' : 'none';
+    });
+  };
+  (function initBadges() {
+    var count = parseInt(localStorage.getItem('unreadCount') || '3');
+    updateBadgeUI(count);
+  })();
+})();
+var um=document.getElementById("userMenuBtn"),ud=document.getElementById("userDropdown");if(um&&ud){um.addEventListener("click",function(e){e.stopPropagation();ud.classList.toggle("show");});document.addEventListener("click",function(){ud.classList.remove("show");});}var savedName=localStorage.getItem("userName");if(savedName){var un=document.querySelector(".user-name");if(un)un.textContent=savedName;var av=document.querySelector(".user-avatar");if(av)av.textContent=savedName.charAt(0);var gn=document.getElementById("greetingName");if(gn)gn.textContent=savedName;}
+// Sync homepage notification unread dots
+var readIds=[];try{readIds=JSON.parse(localStorage.getItem('readNotifIds')||'[]');}catch(e){}
+document.querySelectorAll('#homeNotifList .notif-item').forEach(function(item){
+  var nid=parseInt(item.dataset.nid);
+  if(readIds.indexOf(nid)!==-1){item.classList.remove('unread');}else{item.classList.add('unread');}
+});
+// Time-aware greeting
+(function(){var h=new Date().getHours();var e=document.getElementById("greetingEmoji");var w=document.getElementById("greetingWord");if(e&&w){if(h<6){e.textContent="🌙";w.textContent="夜深了";}else if(h<9){e.textContent="🌅";w.textContent="早上好";}else if(h<12){e.textContent="☀️";w.textContent="上午好";}else if(h<14){e.textContent="🌤️";w.textContent="中午好";}else if(h<18){e.textContent="👋";w.textContent="下午好";}else{e.textContent="🌙";w.textContent="晚上好";}}})();</script>
+
+<script src="_shared.js"></script>
+</body>
+</html>

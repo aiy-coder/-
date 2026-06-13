@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="_shell.css">
+  <title>设置 - 高校教务系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --color-primary-50:#EFF6FF;--color-primary-100:#DBEAFE;--color-primary-200:#BFDBFE;
+  --color-primary-300:#93C5FD;--color-primary-400:#60A5FA;--color-primary-500:#3B82F6;
+  --color-primary-600:#2563EB;--color-primary-700:#1D4ED8;
+  --color-accent-50:#FFFBEB;--color-accent-100:#FEF3C7;--color-accent-200:#FDE68A;
+  --color-accent-300:#FCD34D;--color-accent-400:#FBBF24;--color-accent-500:#F59E0B;
+  --color-neutral-50:#F8FAFC;--color-neutral-100:#F1F5F9;--color-neutral-200:#E2E8F0;
+  --color-neutral-300:#CBD5E1;--color-neutral-400:#94A3B8;--color-neutral-500:#64748B;
+  --color-neutral-600:#475569;--color-neutral-700:#334155;--color-neutral-800:#1E293B;--color-neutral-900:#0F172A;
+  --color-success-500:#10B981;--color-success-100:#D1FAE5;
+  --color-error-500:#EF4444;--color-error-100:#FEE2E2;
+  --font-sans:"Inter","PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,sans-serif;
+  --text-h2:1.25rem;--text-h3:1.125rem;--text-subtitle:1rem;--text-body:0.9375rem;--text-body-s:0.875rem;--text-caption:0.75rem;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-full:9999px;
+  --shadow-card:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-card-hover:0 2px 4px rgba(15,23,42,0.06),0 8px 24px rgba(15,23,42,0.08),0 0 0 1px rgba(59,130,246,0.08);
+  --ease-out:cubic-bezier(0.4,0,0.2,1);--duration-fast:150ms;--duration-normal:250ms;--duration-slow:350ms;
+  --topbar-height:56px;--sidebar-width:240px;--sidebar-collapsed:64px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);background:var(--color-neutral-50);color:var(--color-neutral-800);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background-color var(--duration-normal),color var(--duration-normal);}
+a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;}
+
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:rgba(255,255,255,.85);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border-bottom:1px solid var(--color-neutral-200);display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-5);z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:var(--space-4);min-width:0;}
+.hamburger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-600);}
+.hamburger:hover{background:var(--color-neutral-100);}
+.topbar-logo{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body);font-weight:700;color:var(--color-neutral-900);white-space:nowrap;}
+.topbar-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#FFF;flex-shrink:0;}
+.topbar-logo .logo-icon svg{width:16px;height:16px;}
+.breadcrumb{display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-caption);color:var(--color-neutral-400);white-space:nowrap;}
+.breadcrumb .current{color:var(--color-neutral-600);font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:var(--space-1);}
+.topbar-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-500);position:relative;transition:all var(--duration-fast);}
+.topbar-btn:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.topbar-btn svg{width:20px;height:20px;}
+.notification-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.user-menu{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);cursor:pointer;border:none;background:none;color:var(--color-neutral-800);font-family:var(--font-sans);font-size:var(--text-body-s);}
+.user-menu:hover{background:var(--color-neutral-100);}
+.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#FFF;font-size:13px;font-weight:600;flex-shrink:0;}
+.user-name{font-weight:500;white-space:nowrap;}
+
+.sidebar{position:fixed;top:var(--topbar-height);left:0;bottom:0;width:var(--sidebar-width);background:#FFFFFF;border-right:1px solid var(--color-neutral-200);display:flex;flex-direction:column;z-index:90;transition:width var(--duration-slow) var(--ease-out),background-color var(--duration-normal);overflow:hidden;}
+.sidebar.collapsed{width:var(--sidebar-collapsed);}
+.sidebar-nav{flex:1;padding:var(--space-3);display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);transition:all var(--duration-fast);white-space:nowrap;cursor:pointer;width:100%;text-align:left;font-family:var(--font-sans);border:none;background:none;}
+.nav-item svg{width:20px;height:20px;flex-shrink:0;}
+.nav-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.nav-item.active{background:var(--color-primary-50);color:var(--color-primary-600);box-shadow:inset 3px 0 0 var(--color-primary-500);}
+.nav-item .badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.nav-divider{height:1px;background:var(--color-neutral-200);margin:var(--space-2) var(--space-3);}
+.sidebar-footer{padding:var(--space-3);border-top:1px solid var(--color-neutral-200);}
+.collapse-btn{display:flex;align-items:center;gap:var(--space-3);width:100%;padding:10px var(--space-3);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-500);cursor:pointer;white-space:nowrap;border:none;background:none;}
+.collapse-btn:hover{background:var(--color-neutral-100);}
+.collapse-btn svg{width:20px;height:20px;flex-shrink:0;}
+
+.main-content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:var(--space-6);min-height:calc(100vh - var(--topbar-height));transition:margin-left var(--duration-slow) var(--ease-out);}
+.sidebar.collapsed ~ .main-content{margin-left:var(--sidebar-collapsed);}
+
+.page-header{margin-bottom:var(--space-6);}
+.page-header h1{font-size:var(--text-h2);font-weight:700;color:var(--color-neutral-900);}
+.page-header .subtitle{font-size:var(--text-body-s);color:var(--color-neutral-500);}
+
+.settings-section{margin-bottom:var(--space-5);}
+.settings-section h2{font-size:var(--text-body);font-weight:600;color:var(--color-neutral-500);margin-bottom:var(--space-3);text-transform:uppercase;letter-spacing:.05em;font-size:var(--text-caption);}
+.settings-card{background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);margin-bottom:var(--space-3);}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-neutral-50);transition:background var(--duration-fast);min-height:60px;}
+.settings-row:last-child{border-bottom:none;}
+.settings-row:hover{background:var(--color-neutral-50);}
+.settings-row .row-left{display:flex;align-items:flex-start;gap:var(--space-4);}
+.settings-row .row-icon{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.row-icon--blue{background:var(--color-primary-50);color:var(--color-primary-600);}
+.row-icon--amber{background:var(--color-accent-50);color:var(--color-accent-600);}
+.row-icon--green{background:var(--color-success-100);color:var(--color-success-500);}
+.row-icon--red{background:var(--color-error-100);color:var(--color-error-500);}
+.settings-row .row-icon svg{width:18px;height:18px;}
+.settings-row .row-label{font-size:var(--text-body-s);font-weight:600;color:var(--color-neutral-800);}
+.settings-row .row-desc{font-size:var(--text-caption);color:var(--color-neutral-500);margin-top:1px;}
+
+.toggle-switch{position:relative;width:48px;height:28px;flex-shrink:0;}
+.toggle-switch input{display:none;}
+.toggle-switch .slider{position:absolute;inset:0;background:var(--color-neutral-300);border-radius:var(--radius-full);cursor:pointer;transition:all var(--duration-fast);}
+.toggle-switch .slider::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;background:#FFF;border-radius:50%;transition:all var(--duration-fast);box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.toggle-switch input:checked + .slider{background:var(--color-primary-500);}
+.toggle-switch input:checked + .slider::after{transform:translateX(20px);}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);padding:var(--space-5);}
+.info-field{}
+.info-field .f-label{font-size:var(--text-caption);color:var(--color-neutral-400);margin-bottom:2px;}
+.info-field .f-value{font-size:var(--text-body-s);font-weight:600;color:var(--color-neutral-800);}
+
+.btn-sm{padding:6px 16px;border-radius:var(--radius-sm);font-size:var(--text-caption);font-weight:600;transition:all var(--duration-fast);}
+.btn-outline-blue{background:#FFF;color:var(--color-primary-600);border:1.5px solid var(--color-primary-300);}
+.btn-outline-blue:hover{background:var(--color-primary-50);border-color:var(--color-primary-500);}
+.btn-danger{background:var(--color-error-500);color:#FFF;border:none;}
+.btn-danger:hover{background:#DC2626;}
+
+.about-text{font-size:var(--text-body-s);color:var(--color-neutral-500);line-height:1.7;padding:var(--space-5);}
+.about-text strong{color:var(--color-neutral-800);}
+
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:85;opacity:0;transition:opacity var(--duration-normal);}
+.sidebar-overlay.show{display:block;opacity:1;}
+
+body.dark{--color-neutral-50:#0F172A;--color-neutral-100:#1E293B;--color-neutral-200:#334155;--color-neutral-300:#475569;--color-neutral-400:#64748B;--color-neutral-500:#94A3B8;--color-neutral-600:#CBD5E1;--color-neutral-700:#E2E8F0;--color-neutral-800:#F1F5F9;--color-neutral-900:#F8FAFC;--color-primary-50:rgba(59,130,246,0.15);}
+body.dark .topbar{background:rgba(15,23,42,.85);}
+body.dark .sidebar,body.dark .settings-card{background:#1E293B;}
+body.dark .settings-row:hover{background:rgba(255,255,255,.03);}
+body.dark .btn-outline-blue{background:#1E293B;}
+
+@media(max-width:1024px){
+  .sidebar{width:var(--sidebar-collapsed);}
+  .sidebar .nav-item span,.sidebar .nav-item .badge,.sidebar .nav-divider,.sidebar .collapse-btn span{display:none;}
+  .sidebar .nav-item{justify-content:center;padding:10px;}
+  .sidebar:not(.mobile-open) .collapse-btn{display:none;}
+  .main-content{margin-left:var(--sidebar-collapsed) !important;}
+  .hamburger{display:flex;}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:var(--sidebar-width);z-index:95;}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .sidebar.mobile-open .nav-item{justify-content:flex-start;padding:10px var(--space-3);}
+  .sidebar.mobile-open .nav-item span,.sidebar.mobile-open .nav-item .badge,.sidebar.mobile-open .nav-divider,.sidebar.mobile-open .collapse-btn span{display:inline;}
+  .main-content{margin-left:0 !important;padding:var(--space-3);}
+  .user-name{display:none;}.breadcrumb{display:none;}
+  .info-grid{grid-template-columns:1fr;}
+}
+
+
+.user-menu-wrap{position:relative;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:210px;background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);box-shadow:0 10px 40px rgba(15,23,42,0.14);padding:var(--space-2);z-index:200;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s var(--ease-out);}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);cursor:pointer;transition:all var(--duration-fast);border:none;background:none;width:100%;text-align:left;font-family:var(--font-sans);}
+.dropdown-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.dropdown-item svg{width:18px;height:18px;color:var(--color-neutral-400);flex-shrink:0;}
+.dropdown-item.danger{color:var(--color-error-500);}.dropdown-item.danger:hover{background:var(--color-error-100);}
+.dropdown-divider{height:1px;background:var(--color-neutral-100);margin:var(--space-1) 0;}
+body.dark .user-dropdown{background:#1E293B;border-color:var(--color-neutral-200);}
+body.dark .dropdown-item:hover{background:rgba(255,255,255,.06);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="菜单"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <a href="index.html" class="topbar-logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg></div>教务系统</a>
+    <nav class="breadcrumb"><a href="index.html">首页</a><span>/</span><span class="current">设置</span></nav>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="darkModeToggle" title="暗黑模式"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" id="darkIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <a href="notifications.html" class="topbar-btn" style="position:relative;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notification-count" id="topNotifCount">3</span></a>
+    <div class="user-menu-wrap"><button class="user-menu" id="userMenuBtn"><div class="user-avatar">李</div><span class="user-name">李小宇</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="personal.html" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人信息</a>
+        <a href="#" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a href="login.html" class="dropdown-item danger"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>首页仪表盘</span></a>
+    <a href="schedule.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>课表</span></a>
+    <a href="course-selection.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>选课中心</span></a>
+    <a href="grades.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>成绩查询</span></a>
+    <a href="notifications.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>校园通知</span><span class="badge" id="sidebarBadge">3</span></a>
+    <a href="exams.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span>考试安排</span></a>
+    <div class="nav-divider"></div>
+    <a href="training.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg><span>培养方案</span></a>
+    <a href="payment.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>缴费查询</span></a>
+    <a href="resources.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>教学资源</span></a>
+    <a href="evaluation.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>教学评价</span></a>
+    <button class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></button>
+  </nav>
+  <div class="sidebar-footer"><button class="collapse-btn" id="collapseBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>折叠菜单</span></button></div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="main-content">
+  <div class="page-header">
+    <h1>⚙️ 设置</h1>
+    <p class="subtitle">管理你的账户偏好和应用设置</p>
+  </div>
+
+  <!-- 外观 -->
+  <div class="settings-section">
+    <h2>🎨 外观</h2>
+    <div class="settings-card">
+      <div class="settings-row">
+        <div class="row-left">
+          <div class="row-icon row-icon--blue"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+          <div><div class="row-label">暗黑模式</div><div class="row-desc">切换深色主题，减少夜间使用时的眼睛疲劳</div></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="darkModeSettings"><span class="slider"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="row-left">
+          <div class="row-icon row-icon--blue"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>
+          <div><div class="row-label">侧边栏默认折叠</div><div class="row-desc">打开系统时自动折叠侧边栏，获得更大的内容空间</div></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="autoCollapse"><span class="slider"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通知 -->
+  <div class="settings-section">
+    <h2>🔔 通知偏好</h2>
+    <div class="settings-card">
+      <div class="settings-row">
+        <div class="row-left">
+          <div class="row-icon row-icon--amber"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div><div class="row-label">选课提醒</div><div class="row-desc">选课开放、补选、结果公布时推送通知</div></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="row-left">
+          <div class="row-icon row-icon--amber"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><div class="row-label">考试提醒</div><div class="row-desc">考试前 1 天和考前 1 小时推送提醒</div></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="row-left">
+          <div class="row-icon row-icon--amber"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div><div class="row-label">缴费提醒</div><div class="row-desc">学费缴纳开放和截止前推送通知</div></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox"><span class="slider"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 账户信息 -->
+  <div class="settings-section">
+    <h2>👤 账户信息</h2>
+    <div class="settings-card">
+      <div class="info-grid">
+        <div class="info-field"><div class="f-label">姓名</div><div class="f-value">李小宇</div></div>
+        <div class="info-field"><div class="f-label">学号</div><div class="f-value">20241152019</div></div>
+        <div class="info-field"><div class="f-label">学院</div><div class="f-value">计算机科学与技术学院</div></div>
+        <div class="info-field"><div class="f-label">专业</div><div class="f-value">计算机科学与技术</div></div>
+        <div class="info-field"><div class="f-label">入学年份</div><div class="f-value">2024 年</div></div>
+        <div class="info-field"><div class="f-label">联系邮箱</div><div class="f-value">lixiaoyu@uni.edu.cn</div></div>
+      </div>
+      <div style="padding:var(--space-3) var(--space-5);border-top:1px solid var(--color-neutral-50);display:flex;gap:var(--space-3);">
+        <button class="btn-sm btn-outline-blue">修改密码</button>
+        <button class="btn-sm btn-outline-blue">更换绑定手机</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 关于 -->
+  <div class="settings-section">
+    <h2>ℹ️ 关于</h2>
+    <div class="settings-card">
+      <div class="about-text">
+        <strong>高校教务系统 学生端</strong> v2.0.0<br>
+        本系统为 AI UI 课程期末综合实训项目，使用原生 HTML / CSS / JavaScript 构建。<br>
+        设计风格：现代 · 简洁 · 高效 · 学术严谨。<br><br>
+        <strong>技术栈：</strong>HTML5 + CSS3 (Flexbox/Grid/Bento) + Vanilla JS + ECharts + Lucide Icons<br>
+        <strong>浏览器支持：</strong>Chrome 90+ / Edge 90+ / Safari 15+ / Firefox 90+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- Dark mode toggle (settings page version) ----
+var darkToggle = document.getElementById('darkModeToggle');
+var darkIcon = document.getElementById('darkIcon');
+var darkSettings = document.getElementById('darkModeSettings');
+
+function setDarkMode(on){
+  document.body.classList.toggle('dark', on);
+  var sunIcon = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  var moonIcon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  darkIcon.innerHTML = on ? sunIcon : moonIcon;
+  darkSettings.checked = on;
+  localStorage.setItem('theme', on ? 'dark' : 'light');
+}
+
+darkToggle.addEventListener('click', function(){ setDarkMode(!document.body.classList.contains('dark')); });
+darkSettings.addEventListener('change', function(){ setDarkMode(this.checked); });
+
+// Init dark mode
+var isDark = localStorage.getItem('theme') === 'dark';
+setDarkMode(isDark);
+
+// Auto-collapse sidebar
+var sidebar = document.getElementById('sidebar');
+var autoCollapse = document.getElementById('autoCollapse');
+if (localStorage.getItem('autoCollapse') === 'true') {
+  sidebar.classList.add('collapsed');
+  autoCollapse.checked = true;
+}
+autoCollapse.addEventListener('change', function(){
+  sidebar.classList.toggle('collapsed', this.checked);
+  localStorage.setItem('autoCollapse', this.checked);
+});
+
+// Sidebar
+document.getElementById('collapseBtn').addEventListener('click', function(){ sidebar.classList.toggle('collapsed'); });
+var hamburger = document.getElementById('hamburgerBtn');
+var overlay = document.getElementById('sidebarOverlay');
+function closeSidebar(){ sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); }
+hamburger.addEventListener('click', function(){ sidebar.classList.contains('mobile-open') ? closeSidebar() : (sidebar.classList.add('mobile-open'), overlay.classList.add('show')); });
+overlay.addEventListener('click', closeSidebar);
+
+// Badge
+(function(){
+  var count = parseInt(localStorage.getItem('unreadCount') || '3');
+  var topBadge = document.getElementById('topNotifCount');
+  var sideBadge = document.getElementById('sidebarBadge');
+  [topBadge, sideBadge].forEach(function(el){ if(!el) return; el.textContent = count; el.style.display = count > 0 ? '' : 'none'; });
+})();
+
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){ item.addEventListener('click', function(){ if(window.innerWidth <= 768) closeSidebar(); }); });
+var um=document.getElementById("userMenuBtn"),ud=document.getElementById("userDropdown");if(um&&ud){um.addEventListener("click",function(e){e.stopPropagation();ud.classList.toggle("show");});document.addEventListener("click",function(){ud.classList.remove("show");});}var savedName=localStorage.getItem("userName");if(savedName){var un=document.querySelector(".user-name");if(un)un.textContent=savedName;var av=document.querySelector(".user-avatar");if(av)av.textContent=savedName.charAt(0);}</script>
+<script src="_shared.js"></script>
+</body>
+</html>

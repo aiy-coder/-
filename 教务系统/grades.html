@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="_shell.css">
+  <title>成绩查询 - 高校教务系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+/* ================================================================
+   DESIGN TOKENS
+   ================================================================ */
+:root {
+  --color-primary-50:#EFF6FF;--color-primary-100:#DBEAFE;--color-primary-200:#BFDBFE;
+  --color-primary-300:#93C5FD;--color-primary-400:#60A5FA;--color-primary-500:#3B82F6;
+  --color-primary-600:#2563EB;--color-primary-700:#1D4ED8;--color-primary-800:#1E40AF;
+  --color-accent-50:#FFFBEB;--color-accent-100:#FEF3C7;--color-accent-200:#FDE68A;
+  --color-accent-300:#FCD34D;--color-accent-400:#FBBF24;--color-accent-500:#F59E0B;--color-accent-600:#D97706;
+  --color-neutral-50:#F8FAFC;--color-neutral-100:#F1F5F9;--color-neutral-200:#E2E8F0;
+  --color-neutral-300:#CBD5E1;--color-neutral-400:#94A3B8;--color-neutral-500:#64748B;
+  --color-neutral-600:#475569;--color-neutral-700:#334155;--color-neutral-800:#1E293B;--color-neutral-900:#0F172A;
+  --color-success-500:#10B981;--color-success-100:#D1FAE5;
+  --color-warning-500:#F59E0B;--color-warning-100:#FEF3C7;
+  --color-error-500:#EF4444;--color-error-100:#FEE2E2;
+  --font-sans:"Inter","PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,sans-serif;
+  --text-display:2rem;--text-h2:1.25rem;--text-h3:1.125rem;--text-subtitle:1rem;
+  --text-body:0.9375rem;--text-body-s:0.875rem;--text-caption:0.75rem;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-full:9999px;
+  --shadow-card:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-card-hover:0 2px 4px rgba(15,23,42,0.06),0 8px 24px rgba(15,23,42,0.08),0 0 0 1px rgba(59,130,246,0.08);
+  --ease-out:cubic-bezier(0.4,0,0.2,1);--ease-elastic:cubic-bezier(0.34,1.56,0.64,1);
+  --ease-in-out:cubic-bezier(0.2,0,0,1);--duration-fast:150ms;--duration-normal:250ms;--duration-slow:350ms;
+  --topbar-height:56px;--sidebar-width:240px;--sidebar-collapsed:64px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:var(--font-sans);background:var(--color-neutral-50);
+  color:var(--color-neutral-800);line-height:1.5;-webkit-font-smoothing:antialiased;
+  transition:background-color var(--duration-normal),color var(--duration-normal);
+}
+a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;}
+
+/* ========== TOPBAR ========== */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-height);
+  background:rgba(255,255,255,.85);backdrop-filter:blur(16px) saturate(180%);
+  -webkit-backdrop-filter:blur(16px) saturate(180%);
+  border-bottom:1px solid var(--color-neutral-200);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--space-5);z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:var(--space-4);min-width:0;}
+.hamburger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-600);}
+.hamburger:hover{background:var(--color-neutral-100);}
+.topbar-logo{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body);font-weight:700;color:var(--color-neutral-900);white-space:nowrap;}
+.topbar-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#FFF;flex-shrink:0;}
+.topbar-logo .logo-icon svg{width:16px;height:16px;}
+.breadcrumb{display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-caption);color:var(--color-neutral-400);white-space:nowrap;}
+.breadcrumb .current{color:var(--color-neutral-600);font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:var(--space-1);}
+.topbar-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-500);position:relative;transition:all var(--duration-fast);}
+.topbar-btn:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.topbar-btn svg{width:20px;height:20px;}
+.notification-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.user-menu{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);cursor:pointer;border:none;background:none;color:var(--color-neutral-800);font-family:var(--font-sans);font-size:var(--text-body-s);}
+.user-menu:hover{background:var(--color-neutral-100);}
+.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#FFF;font-size:13px;font-weight:600;flex-shrink:0;}
+.user-name{font-weight:500;white-space:nowrap;}
+
+/* ========== SIDEBAR ========== */
+.sidebar{
+  position:fixed;top:var(--topbar-height);left:0;bottom:0;width:var(--sidebar-width);
+  background:#FFFFFF;border-right:1px solid var(--color-neutral-200);
+  display:flex;flex-direction:column;z-index:90;
+  transition:width var(--duration-slow) var(--ease-in-out),background-color var(--duration-normal);
+  overflow:hidden;
+}
+.sidebar.collapsed{width:var(--sidebar-collapsed);}
+.sidebar-nav{flex:1;padding:var(--space-3);display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;}
+.nav-item{
+  display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);
+  border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;
+  color:var(--color-neutral-600);transition:all var(--duration-fast);
+  white-space:nowrap;cursor:pointer;width:100%;text-align:left;font-family:var(--font-sans);border:none;background:none;
+}
+.nav-item svg{width:20px;height:20px;flex-shrink:0;}
+.nav-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.nav-item.active{background:var(--color-primary-50);color:var(--color-primary-600);box-shadow:inset 3px 0 0 var(--color-primary-500);}
+.nav-item .badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.nav-divider{height:1px;background:var(--color-neutral-200);margin:var(--space-2) var(--space-3);}
+.sidebar-footer{padding:var(--space-3);border-top:1px solid var(--color-neutral-200);}
+.collapse-btn{display:flex;align-items:center;gap:var(--space-3);width:100%;padding:10px var(--space-3);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-500);cursor:pointer;white-space:nowrap;border:none;background:none;}
+.collapse-btn:hover{background:var(--color-neutral-100);}
+.collapse-btn svg{width:20px;height:20px;flex-shrink:0;}
+
+/* ========== MAIN CONTENT ========== */
+.main-content{
+  margin-left:var(--sidebar-width);margin-top:var(--topbar-height);
+  padding:var(--space-6);min-height:calc(100vh - var(--topbar-height));
+  transition:margin-left var(--duration-slow) var(--ease-in-out);
+  display:flex;gap:var(--space-6);
+}
+.sidebar.collapsed ~ .main-content{margin-left:var(--sidebar-collapsed);}
+.content-primary{flex:1;min-width:0;}
+
+/* ========== PAGE HEADER ========== */
+.page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:var(--space-5);flex-wrap:wrap;gap:var(--space-3);
+}
+.page-header h1{font-size:var(--text-h2);font-weight:700;color:var(--color-neutral-900);}
+.semester-select{
+  height:40px;padding:0 36px 0 var(--space-4);
+  font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:600;
+  color:var(--color-neutral-700);background:#FFFFFF;
+  border:1.5px solid var(--color-neutral-200);border-radius:var(--radius-md);
+  outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  min-width:200px;
+}
+.semester-select:hover{border-color:var(--color-neutral-300);}
+
+/* ========== STAT CARDS ROW ========== */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-5);}
+.stat-card{
+  background:#FFFFFF;border:1px solid var(--color-neutral-200);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  box-shadow:var(--shadow-card);transition:all var(--duration-normal);
+}
+.stat-card:hover{box-shadow:var(--shadow-card-hover);transform:translateY(-2px);}
+.stat-card .stat-label{font-size:var(--text-caption);color:var(--color-neutral-500);margin-bottom:var(--space-1);}
+.stat-card .stat-value{font-size:var(--text-display);font-weight:700;color:var(--color-neutral-900);line-height:1.1;}
+.stat-card .stat-change{font-size:var(--text-caption);font-weight:500;margin-top:var(--space-1);}
+.stat-card .stat-change.up{color:var(--color-success-500);}
+.stat-card .stat-change.down{color:var(--color-error-500);}
+
+/* ========== CHARTS ROW ========== */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-5);}
+.chart-card{
+  background:#FFFFFF;border:1px solid var(--color-neutral-200);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  box-shadow:var(--shadow-card);transition:all var(--duration-normal);
+}
+.chart-card:hover{box-shadow:var(--shadow-card-hover);}
+.chart-card h3{font-size:var(--text-body);font-weight:600;color:var(--color-neutral-800);margin-bottom:var(--space-2);}
+.chart-wrap{width:100%;height:280px;}
+
+/* ========== COURSE TABLE ========== */
+.table-card{
+  background:#FFFFFF;border:1px solid var(--color-neutral-200);
+  border-radius:var(--radius-lg);overflow:hidden;
+  box-shadow:var(--shadow-card);margin-bottom:var(--space-5);
+}
+.table-card .table-header{
+  padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-neutral-200);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);
+}
+.table-card .table-header h3{font-size:var(--text-body);font-weight:600;color:var(--color-neutral-800);}
+.table-summary{font-size:var(--text-caption);color:var(--color-neutral-500);}
+.table-summary strong{color:var(--color-neutral-800);}
+.grade-table{width:100%;border-collapse:collapse;}
+.grade-table th{
+  padding:var(--space-3) var(--space-4);font-size:var(--text-caption);font-weight:600;
+  color:var(--color-neutral-500);text-align:left;background:var(--color-neutral-50);
+  border-bottom:1px solid var(--color-neutral-200);white-space:nowrap;
+}
+.grade-table td{
+  padding:var(--space-3) var(--space-4);font-size:var(--text-body-s);
+  color:var(--color-neutral-700);border-bottom:1px solid var(--color-neutral-50);
+  transition:background var(--duration-fast);
+}
+.grade-table tbody tr:hover td{background:var(--color-primary-50);}
+.grade-table tbody tr:last-child td{border-bottom:none;}
+.grade-score{font-weight:700;font-size:var(--text-subtitle);}
+.grade-score.excellent{color:var(--color-success-500);}
+.grade-score.good{color:var(--color-primary-500);}
+.grade-score.average{color:var(--color-accent-500);}
+.grade-score.passing{color:var(--color-warning-500);}
+.grade-score.fail{color:var(--color-error-500);}
+.grade-level{
+  display:inline-block;padding:2px 10px;border-radius:var(--radius-full);
+  font-size:11px;font-weight:600;
+}
+.grade-level--a{background:var(--color-success-100);color:var(--color-success-500);}
+.grade-level--b{background:var(--color-primary-50);color:var(--color-primary-600);}
+.grade-level--c{background:var(--color-warning-50);color:var(--color-accent-600);}
+.grade-level--d{background:var(--color-error-50);color:var(--color-error-500);}
+.grade-level--f{background:var(--color-error-100);color:var(--color-error-500);}
+.type-badge{
+  display:inline-block;padding:2px 8px;border-radius:var(--radius-full);
+  font-size:10px;font-weight:600;letter-spacing:.03em;
+}
+.type-badge--required{background:var(--color-primary-100);color:var(--color-primary-700);}
+.type-badge--major{background:var(--color-primary-50);color:var(--color-primary-600);}
+.type-badge--elective{background:var(--color-accent-50);color:var(--color-accent-600);}
+.type-badge--general{background:var(--color-neutral-100);color:var(--color-neutral-600);}
+
+/* ========== RIGHT PANEL ========== */
+.right-panel{width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:var(--space-5);}
+.panel-card{
+  background:#FFFFFF;border:1px solid var(--color-neutral-200);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  box-shadow:var(--shadow-card);transition:all var(--duration-normal);
+}
+.panel-card:hover{box-shadow:var(--shadow-card-hover);}
+.panel-card h3{font-size:var(--text-body);font-weight:600;color:var(--color-neutral-800);margin-bottom:var(--space-4);}
+.radar-wrap{width:100%;height:240px;}
+.rank-list{display:flex;flex-direction:column;gap:var(--space-2);}
+.rank-item{
+  display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0;
+  font-size:var(--text-body-s);
+}
+.rank-item .rank-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.rank-num--1{background:#FCD34D;color:#B45309;}
+.rank-num--2{background:#CBD5E1;color:#475569;}
+.rank-num--3{background:#FDE68A;color:#92400E;}
+.rank-num--other{background:var(--color-neutral-100);color:var(--color-neutral-500);}
+.rank-item .rank-name{flex:1;font-weight:500;color:var(--color-neutral-700);}
+.rank-item .rank-name.me{color:var(--color-primary-600);font-weight:700;}
+.rank-item .rank-gpa{font-weight:600;color:var(--color-neutral-800);}
+
+/* ========== OVERLAY ========== */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:85;opacity:0;transition:opacity var(--duration-normal);}
+.sidebar-overlay.show{display:block;opacity:1;}
+
+/* ========== DARK MODE ========== */
+body.dark{
+  --color-neutral-50:#0F172A;--color-neutral-100:#1E293B;--color-neutral-200:#334155;
+  --color-neutral-300:#475569;--color-neutral-400:#64748B;--color-neutral-500:#94A3B8;
+  --color-neutral-600:#CBD5E1;--color-neutral-700:#E2E8F0;--color-neutral-800:#F1F5F9;--color-neutral-900:#F8FAFC;
+  --color-primary-50:rgba(59,130,246,0.15);--color-primary-100:rgba(59,130,246,0.2);
+}
+body.dark .topbar{background:rgba(15,23,42,.85);}
+body.dark .sidebar,body.dark .stat-card,body.dark .chart-card,body.dark .table-card,body.dark .panel-card,body.dark .semester-select{background:#1E293B;}
+body.dark .grade-table th{background:rgba(255,255,255,.03);}
+body.dark .grade-table tbody tr:hover td{background:rgba(59,130,246,0.08);}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:1280px){.right-panel{display:none;}.charts-row{grid-template-columns:1fr;}}
+@media(max-width:1024px){
+  .sidebar{width:var(--sidebar-collapsed);}
+  .sidebar .nav-item span,.sidebar .nav-item .badge,.sidebar .nav-divider,.sidebar .collapse-btn span{display:none;}
+  .sidebar .nav-item{justify-content:center;padding:10px;}
+  .sidebar:not(.mobile-open) .collapse-btn{display:none;}
+  .main-content{margin-left:var(--sidebar-collapsed) !important;}
+  .hamburger{display:flex;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:var(--sidebar-width);z-index:95;}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .sidebar.mobile-open .nav-item{justify-content:flex-start;padding:10px var(--space-3);}
+  .sidebar.mobile-open .nav-item span,.sidebar.mobile-open .nav-item .badge,.sidebar.mobile-open .nav-divider,.sidebar.mobile-open .collapse-btn span{display:inline;}
+  .main-content{margin-left:0 !important;padding:var(--space-3);flex-direction:column;}
+  .user-name{display:none;}
+  .breadcrumb{display:none;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .charts-row{grid-template-columns:1fr;}
+  .chart-wrap{height:220px;}
+  .grade-table{font-size:var(--text-caption);}
+  .grade-table th,.grade-table td{padding:var(--space-2) var(--space-2);}
+}
+
+
+.user-menu-wrap{position:relative;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:210px;background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);box-shadow:0 10px 40px rgba(15,23,42,0.14);padding:var(--space-2);z-index:200;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s var(--ease-out);}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);cursor:pointer;transition:all var(--duration-fast);border:none;background:none;width:100%;text-align:left;font-family:var(--font-sans);}
+.dropdown-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.dropdown-item svg{width:18px;height:18px;color:var(--color-neutral-400);flex-shrink:0;}
+.dropdown-item.danger{color:var(--color-error-500);}.dropdown-item.danger:hover{background:var(--color-error-100);}
+.dropdown-divider{height:1px;background:var(--color-neutral-100);margin:var(--space-1) 0;}
+body.dark .user-dropdown{background:#1E293B;border-color:var(--color-neutral-200);}
+body.dark .dropdown-item:hover{background:rgba(255,255,255,.06);}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="topbar-logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg></div>教务系统</a>
+    <nav class="breadcrumb"><a href="index.html">首页</a><span>/</span><span class="current">成绩查询</span></nav>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="darkModeToggle" title="暗黑模式"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" id="darkIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <a href="notifications.html" class="topbar-btn" style="position:relative;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notification-count" id="topNotifCount">3</span></a>
+    <div class="user-menu-wrap"><button class="user-menu" id="userMenuBtn"><div class="user-avatar">李</div><span class="user-name">李小宇</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="personal.html" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人信息</a>
+        <a href="#" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a href="login.html" class="dropdown-item danger"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>首页仪表盘</span></a>
+    <a href="schedule.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>课表</span></a>
+    <a href="course-selection.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>选课中心</span></a>
+    <button class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>成绩查询</span></button>
+    <a href="notifications.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>校园通知</span><span class="badge" id="sidebarBadge">3</span></a>
+    <a href="exams.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span>考试安排</span></a>
+    <div class="nav-divider"></div>
+    <a href="training.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg><span>培养方案</span></a>
+    <a href="payment.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>缴费查询</span></a>
+    <a href="resources.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>教学资源</span></a>
+    <a href="evaluation.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>教学评价</span></a>
+    <a href="settings.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+  </nav>
+  <div class="sidebar-footer"><button class="collapse-btn" id="collapseBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>折叠菜单</span></button></div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <div class="content-primary">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>📊 成绩查询</h1>
+      <select class="semester-select" id="semesterSelect">
+        <option value="4">2025-2026学年 第二学期（当前）</option>
+        <option value="3">2025-2026学年 第一学期</option>
+        <option value="2">2024-2025学年 第二学期</option>
+        <option value="1">2024-2025学年 第一学期</option>
+      </select>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stat-row" id="statRow"></div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>📈 学期GPA趋势</h3>
+        <div class="chart-wrap" id="gpaTrendChart"></div>
+      </div>
+      <div class="chart-card">
+        <h3>🎯 学科能力对比</h3>
+        <div class="chart-wrap" id="subjectRadar"></div>
+      </div>
+    </div>
+
+    <!-- Course Grade Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>📋 课程成绩明细</h3>
+        <div class="table-summary" id="tableSummary">共 <strong>7</strong> 门课程</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th>课程代码</th><th>课程名称</th><th>类型</th><th>学分</th><th>成绩</th><th>绩点</th><th>等级</th><th>班级排名</th>
+            </tr>
+          </thead>
+          <tbody id="gradeTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="panel-card">
+      <h3>🏆 班级排名 TOP 5</h3>
+      <div class="rank-list" id="rankList"></div>
+    </div>
+    <div class="panel-card">
+      <h3>📊 学分进度</h3>
+      <div class="radar-wrap" id="creditProgressChart"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   DATA
+   ================================================================ */
+const SEMESTERS = {
+  4: { name:'2025-2026学年 第二学期', gpa:3.72, totalCredits:22, avgScore:86.3, rank:'15/85', rankPct:'前18%',
+    courses:[
+      {code:'CS301',name:'算法设计与分析',type:'major',credits:4,score:92,gpa:4.0,level:'A',rank:'3/85'},
+      {code:'CS302',name:'机器学习导论',type:'elective',credits:3,score:88,gpa:3.7,level:'A',rank:'8/85'},
+      {code:'CS303',name:'计算机网络',type:'major',credits:3.5,score:85,gpa:3.3,level:'B',rank:'18/85'},
+      {code:'ENG401',name:'学术英语写作',type:'general',credits:2,score:90,gpa:4.0,level:'A',rank:'5/85'},
+      {code:'MATH301',name:'概率论与数理统计',type:'required',credits:5,score:78,gpa:2.7,level:'C',rank:'35/85'},
+      {code:'CS305',name:'软件工程',type:'major',credits:3,score:82,gpa:3.0,level:'B',rank:'22/85'},
+      {code:'ART102',name:'中国书法鉴赏',type:'general',credits:1.5,score:95,gpa:4.0,level:'A',rank:'1/85'},
+    ],
+    ranks:[
+      {name:'王同学',gpa:3.95},{name:'张同学',gpa:3.88},{name:'陈同学',gpa:3.81},
+      {name:'李小宇',gpa:3.72,me:true},{name:'赵同学',gpa:3.68},
+    ]
+  },
+  3: { name:'2025-2026学年 第一学期', gpa:3.64, totalCredits:24, avgScore:84.1, rank:'20/85', rankPct:'前24%',
+    courses:[
+      {code:'CS201',name:'数据结构',type:'major',credits:4,score:88,gpa:3.7,level:'A',rank:'10/85'},
+      {code:'CS202',name:'操作系统',type:'major',credits:3,score:81,gpa:3.0,level:'B',rank:'25/85'},
+      {code:'MATH201',name:'高等数学(下)',type:'required',credits:5,score:76,gpa:2.3,level:'C',rank:'38/85'},
+      {code:'ENG301',name:'大学英语(三)',type:'required',credits:3,score:85,gpa:3.3,level:'B',rank:'16/85'},
+      {code:'PHYS101',name:'大学物理',type:'required',credits:4,score:82,gpa:3.0,level:'B',rank:'20/85'},
+      {code:'POL101',name:'思政',type:'general',credits:2,score:90,gpa:4.0,level:'A',rank:'4/85'},
+      {code:'CS204',name:'Java程序设计',type:'elective',credits:3,score:87,gpa:3.7,level:'A',rank:'9/85'},
+    ],
+    ranks:[
+      {name:'王同学',gpa:3.91},{name:'张同学',gpa:3.84},{name:'刘同学',gpa:3.76},
+      {name:'陈同学',gpa:3.70},{name:'李小宇',gpa:3.64,me:true},
+    ]
+  },
+  2: { name:'2024-2025学年 第二学期', gpa:3.52, totalCredits:22, avgScore:82.5, rank:'22/85', rankPct:'前26%', courses:[], ranks:[] },
+  1: { name:'2024-2025学年 第一学期', gpa:3.45, totalCredits:20, avgScore:81.2, rank:'25/82', rankPct:'前30%', courses:[], ranks:[] },
+};
+
+const ALL_GPA_HISTORY = [
+  {sem:'大一上',gpa:3.28},
+  {sem:'大一下',gpa:3.45},
+  {sem:'大二上',gpa:3.52},
+  {sem:'大二下',gpa:3.64},
+  {sem:'大三上',gpa:3.72},
+];
+
+let gpaChart, radarChart, creditChart;
+
+// ================================================================
+// RENDER
+// ================================================================
+function renderSemester(semId) {
+  const data = SEMESTERS[semId];
+  if (!data) return;
+
+  // Stat cards
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat-card"><div class="stat-label">学期 GPA</div><div class="stat-value">${data.gpa}</div><div class="stat-change up">↑ 较上学期 +${(data.gpa - (SEMESTERS[Math.max(1, semId-1)]?.gpa || data.gpa - 0.08)).toFixed(2)}</div></div>
+    <div class="stat-card"><div class="stat-label">总修学分</div><div class="stat-value">${data.totalCredits}</div><div class="stat-change" style="color:var(--color-neutral-500);">${data.courses?.length || 7} 门课程</div></div>
+    <div class="stat-card"><div class="stat-label">加权平均分</div><div class="stat-value">${data.avgScore}</div><div class="stat-change up">学期目标: 85</div></div>
+    <div class="stat-card"><div class="stat-label">班级排名</div><div class="stat-value">${data.rank}</div><div class="stat-change up">${data.rankPct}</div></div>`;
+
+  // Table
+  const tbody = document.getElementById('gradeTableBody');
+  document.getElementById('tableSummary').innerHTML = `共 <strong>${data.courses?.length || 0}</strong> 门课程`;
+  if (data.courses) {
+    tbody.innerHTML = data.courses.map(c => {
+      let scoreClass = 'average';
+      if (c.score >= 90) scoreClass = 'excellent';
+      else if (c.score >= 85) scoreClass = 'good';
+      else if (c.score >= 75) scoreClass = 'average';
+      else if (c.score >= 60) scoreClass = 'passing';
+      else scoreClass = 'fail';
+
+      const levelClass = `grade-level--${c.level.toLowerCase()}`;
+      let typeClass = 'type-badge--general';
+      if (c.type === 'required') typeClass = 'type-badge--required';
+      else if (c.type === 'major') typeClass = 'type-badge--major';
+      else if (c.type === 'elective') typeClass = 'type-badge--elective';
+
+      const typeLabel = {required:'通识必修',major:'专业必修',elective:'专业选修',general:'通识选修'}[c.type] || c.type;
+
+      return `<tr>
+        <td style="font-size:var(--text-caption);color:var(--color-neutral-400);">${c.code}</td>
+        <td style="font-weight:600;">${c.name}</td>
+        <td><span class="type-badge ${typeClass}">${typeLabel}</span></td>
+        <td>${c.credits}</td>
+        <td class="grade-score ${scoreClass}">${c.score}</td>
+        <td style="font-weight:600;">${c.gpa.toFixed(1)}</td>
+        <td><span class="grade-level ${levelClass}">${c.level}</span></td>
+        <td style="font-size:var(--text-caption);color:var(--color-neutral-500);">${c.rank}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Rank list
+  if (data.ranks && data.ranks.length) {
+    document.getElementById('rankList').innerHTML = data.ranks.map((r,i) => {
+      let numClass = 'rank-num--other';
+      if (i === 0) numClass = 'rank-num--1';
+      else if (i === 1) numClass = 'rank-num--2';
+      else if (i === 2) numClass = 'rank-num--3';
+      return `<div class="rank-item">
+        <span class="rank-num ${numClass}">${i+1}</span>
+        <span class="rank-name${r.me ? ' me' : ''}">${r.name}${r.me ? ' (你)' : ''}</span>
+        <span class="rank-gpa">${r.gpa}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ================================================================
+// ECHARTS
+// ================================================================
+function renderCharts() {
+  const isDark = document.body.classList.contains('dark');
+  const textColor = isDark ? '#CBD5E1' : '#64748B';
+  const axisColor = isDark ? '#334155' : '#E2E8F0';
+
+  // GPA Trend
+  if (!gpaChart) gpaChart = echarts.init(document.getElementById('gpaTrendChart'));
+  gpaChart.setOption({
+    tooltip:{trigger:'axis',backgroundColor:isDark?'#1E293B':'#FFF',borderColor:axisColor,textStyle:{color:isDark?'#F1F5F9':'#1E293B',fontSize:13}},
+    grid:{left:40,right:20,top:20,bottom:30},
+    xAxis:{type:'category',data:ALL_GPA_HISTORY.map(d=>d.sem),axisLine:{lineStyle:{color:axisColor}},axisTick:{show:false},axisLabel:{color:textColor,fontSize:11}},
+    yAxis:{type:'value',min:2.8,max:4.1,interval:.2,splitLine:{lineStyle:{color:axisColor,type:'dashed'}},axisLabel:{color:textColor,fontSize:11}},
+    series:[{
+      type:'line',smooth:true,symbol:'circle',symbolSize:10,
+      data:ALL_GPA_HISTORY.map(d=>d.gpa),
+      lineStyle:{color:'#3B82F6',width:3},
+      itemStyle:{color:'#3B82F6',borderColor:'#FFF',borderWidth:2},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(59,130,246,0.25)'},{offset:1,color:'rgba(59,130,246,0.02)'}])},
+      markLine:{silent:true,data:[{yAxis:3.5,label:{formatter:'目标线 3.5',color:textColor,fontSize:10}}],lineStyle:{color:'#F59E0B',type:'dashed',width:1.5}}
+    }]
+  });
+
+  // Subject Radar
+  if (!radarChart) radarChart = echarts.init(document.getElementById('subjectRadar'));
+  radarChart.setOption({
+    radar:{center:['50%','50%'],radius:'65%',indicator:[
+      {name:'编程',max:100},{name:'数学',max:100},{name:'英语',max:100},{name:'物理',max:100},{name:'通识',max:100},{name:'论文',max:100}
+    ],axisName:{color:textColor,fontSize:11},splitArea:{areaStyle:{color:[isDark?'rgba(59,130,246,0.05)':'rgba(59,130,246,0.03)','transparent']}},axisLine:{lineStyle:{color:axisColor}},splitLine:{lineStyle:{color:axisColor}}},
+    series:[{type:'radar',data:[{value:[88,72,78,68,82,75],name:'本学期',areaStyle:{color:'rgba(59,130,246,0.25)'},lineStyle:{color:'#3B82F6',width:2},itemStyle:{color:'#3B82F6'},symbol:'circle',symbolSize:6},{value:[80,68,72,65,78,70],name:'上学期',areaStyle:{color:'rgba(148,163,184,0.15)'},lineStyle:{color:'#94A3B8',width:1.5,type:'dashed'},itemStyle:{color:'#94A3B8'},symbol:'diamond',symbolSize:5}]}]
+  });
+
+  // Credit progress gauge
+  if (!creditChart) creditChart = echarts.init(document.getElementById('creditProgressChart'));
+  creditChart.setOption({
+    graphic:[{type:'text',left:'center',top:'center',style:{text:'118/164',fontSize:18,fontWeight:'bold',fontFamily:'Inter,"PingFang SC",sans-serif',fill:isDark?'#F1F5F9':'#1E293B',textAlign:'center',textVerticalAlign:'middle'}}],
+    series:[{type:'pie',radius:['75%','90%'],center:['50%','50%'],silent:true,label:{show:false},emphasis:{disabled:true},
+      data:[{value:118,itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,1,[{offset:0,color:'#3B82F6'},{offset:1,color:'#7C3AED'}])}},{value:46,itemStyle:{color:'transparent'}}]
+    }]
+  });
+}
+
+function resizeCharts() {
+  if (gpaChart) gpaChart.resize();
+  if (radarChart) radarChart.resize();
+  if (creditChart) creditChart.resize();
+}
+
+// ================================================================
+// SEMESTER SWITCH
+// ================================================================
+document.getElementById('semesterSelect').addEventListener('change', function() {
+  renderSemester(parseInt(this.value));
+});
+
+// ================================================================
+// SIDEBAR & DARK MODE
+// ================================================================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('collapseBtn').addEventListener('click', () => { sidebar.classList.toggle('collapsed'); setTimeout(resizeCharts, 350); });
+
+const hamburger = document.getElementById('hamburgerBtn');
+const overlay = document.getElementById('sidebarOverlay');
+function closeSidebar() { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); }
+hamburger.addEventListener('click', () => {
+  sidebar.classList.contains('mobile-open') ? closeSidebar() : (sidebar.classList.add('mobile-open'), overlay.classList.add('show'));
+});
+overlay.addEventListener('click', closeSidebar);
+
+const darkToggle = document.getElementById('darkModeToggle');
+const darkIcon = document.getElementById('darkIcon');
+function setDarkMode(on) {
+  document.body.classList.toggle('dark', on);
+  darkIcon.innerHTML = on ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  localStorage.setItem('theme', on ? 'dark' : 'light');
+  setTimeout(() => { renderCharts(); }, 300);
+}
+darkToggle.addEventListener('click', () => setDarkMode(!document.body.classList.contains('dark')));
+if (localStorage.getItem('theme') === 'dark') setDarkMode(true);
+
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+  item.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); });
+});
+
+window.addEventListener('resize', () => { clearTimeout(window._rt); window._rt = setTimeout(resizeCharts, 200); });
+
+// INIT
+renderSemester(4);
+// ---- Badge persistence across pages ----
+(function initBadges() {
+  var count = parseInt(localStorage.getItem('unreadCount') || '3');
+  var topBadge = document.getElementById('topNotifCount');
+  var sideBadge = document.getElementById('sidebarBadge');
+  [topBadge, sideBadge].forEach(function(el) {
+    if (!el) return;
+    el.textContent = count;
+    el.style.display = count > 0 ? '' : 'none';
+  });
+})();
+
+renderCharts();
+var um=document.getElementById("userMenuBtn"),ud=document.getElementById("userDropdown");if(um&&ud){um.addEventListener("click",function(e){e.stopPropagation();ud.classList.toggle("show");});document.addEventListener("click",function(){ud.classList.remove("show");});}var savedName=localStorage.getItem("userName");if(savedName){var un=document.querySelector(".user-name");if(un)un.textContent=savedName;var av=document.querySelector(".user-avatar");if(av)av.textContent=savedName.charAt(0);}</script>
+<script src="_shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 - 高校教务系统</title>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* ================================================================
+   DESIGN TOKENS (aligned with Design System)
+   ================================================================ */
+:root {
+  --color-primary-50:  #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+
+  --color-accent-50:  #FFFBEB;
+  --color-accent-100: #FEF3C7;
+  --color-accent-200: #FDE68A;
+  --color-accent-300: #FCD34D;
+  --color-accent-400: #FBBF24;
+  --color-accent-500: #F59E0B;
+  --color-accent-600: #D97706;
+
+  --color-neutral-50:  #F8FAFC;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
+
+  --color-success-500: #10B981;
+  --color-error-500:   #EF4444;
+  --color-error-100:   #FEE2E2;
+
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+
+  --shadow-card:
+    0 1px 2px  rgba(15, 23, 42, 0.04),
+    0 2px 8px  rgba(15, 23, 42, 0.04);
+  --shadow-card-hover:
+    0 2px 4px  rgba(15, 23, 42, 0.06),
+    0 12px 32px rgba(15, 23, 42, 0.10);
+
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.2, 0, 0, 1);
+
+  --duration-fast:   150ms;
+  --duration-normal: 250ms;
+  --duration-slow:   400ms;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-neutral-50);
+  color: var(--color-neutral-800);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================================================================
+   BACKGROUND DECORATION (subtle academic feel)
+   ================================================================ */
+.bg-decoration {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg-decoration::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.bg-decoration::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -15%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* Grid pattern overlay — subtle academic grid paper feel */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.25;
+  background-image:
+    linear-gradient(var(--color-neutral-200) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-neutral-200) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center center;
+}
+
+/* ================================================================
+   LOGIN CONTAINER
+   ================================================================ */
+.login-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  padding: 0 20px;
+}
+
+/* ================================================================
+   LOGIN CARD
+   ================================================================ */
+.login-card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px 40px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.login-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ================================================================
+   BRAND AREA
+   ================================================================ */
+.login-brand {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.login-brand .brand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--color-primary-500), #7C3AED);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.login-brand .brand-icon svg {
+  width: 28px;
+  height: 28px;
+  color: #FFFFFF;
+  stroke-width: 2;
+}
+
+.login-brand h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.login-brand p {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-neutral-500);
+  margin-top: 4px;
+}
+
+/* ================================================================
+   FORM ELEMENTS
+   ================================================================ */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-neutral-700);
+  margin-bottom: 6px;
+}
+
+.form-input-wrapper {
+  position: relative;
+}
+
+.form-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px 0 42px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-neutral-800);
+  background: var(--color-neutral-50);
+  border: 1.5px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.form-input::placeholder {
+  color: var(--color-neutral-400);
+}
+
+.form-input:hover {
+  border-color: var(--color-neutral-300);
+  background: #FFFFFF;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary-500);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+
+.form-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--color-neutral-400);
+  pointer-events: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.form-input:focus ~ .form-input-icon,
+.form-input-wrapper:focus-within .form-input-icon {
+  color: var(--color-primary-500);
+}
+
+/* ================================================================
+   REMEMBER & FORGOT ROW
+   ================================================================ */
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-neutral-300);
+  border-radius: 5px;
+  background: #FFFFFF;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--duration-fast) var(--ease-out);
+  flex-shrink: 0;
+}
+
+.remember-me input[type="checkbox"]:checked {
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+}
+
+.remember-me input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #FFFFFF;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.remember-me span {
+  font-size: 14px;
+  color: var(--color-neutral-600);
+  user-select: none;
+}
+
+.forgot-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary-600);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.forgot-link:hover {
+  color: var(--color-primary-700);
+}
+
+/* ================================================================
+   LOGIN BUTTON
+   ================================================================ */
+.btn-login {
+  width: 100%;
+  height: 46px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--color-primary-500);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08),
+              0 0 0 1px rgba(59, 130, 246, 0.2);
+  transition: all var(--duration-normal) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-login:hover {
+  background: var(--color-primary-600);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-login:active {
+  background: var(--color-primary-700);
+  transform: translateY(0);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  transition: all 0.05s;
+}
+
+/* Ripple effect container */
+.btn-login .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple-anim 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple-anim {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ================================================================
+   DIVIDER
+   ================================================================ */
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-neutral-200);
+}
+
+.login-divider span {
+  font-size: 12px;
+  color: var(--color-neutral-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ================================================================
+   ALTERNATIVE LOGIN METHODS
+   ================================================================ */
+.alt-login {
+  display: flex;
+  gap: 12px;
+}
+
+.alt-login-btn {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-neutral-700);
+  background: #FFFFFF;
+  border: 1.5px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.alt-login-btn:hover {
+  border-color: var(--color-neutral-300);
+  background: var(--color-neutral-50);
+}
+
+.alt-login-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ================================================================
+   ERROR STATE (hidden by default)
+   ================================================================ */
+.form-error {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--color-error-100);
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #B91C1C;
+}
+
+.form-error.visible {
+  display: flex;
+}
+
+.form-error svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Shake animation for error */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.login-card.shake {
+  animation: shake 0.5s var(--ease-out);
+}
+
+/* ================================================================
+   LOADING STATE
+   ================================================================ */
+.btn-login.loading {
+  pointer-events: none;
+  color: transparent;
+}
+
+.btn-login .spinner {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn-login.loading .spinner {
+  display: block;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ================================================================
+   FOOTER TEXT
+   ================================================================ */
+.login-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--color-neutral-400);
+}
+
+.login-footer a {
+  color: var(--color-primary-500);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-footer a:hover {
+  color: var(--color-primary-600);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px 28px;
+    border-radius: var(--radius-lg);
+  }
+
+  .login-brand h1 {
+    font-size: 20px;
+  }
+
+  .alt-login {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Background decoration -->
+<div class="bg-decoration"></div>
+<div class="bg-grid"></div>
+
+<!-- Login Form -->
+<div class="login-wrapper">
+  <div class="login-card" id="loginCard">
+
+    <!-- Brand -->
+    <div class="login-brand">
+      <div class="brand-icon">
+        <!-- Graduation cap icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/>
+        </svg>
+      </div>
+      <h1>高校教务系统</h1>
+      <p>Academic Affairs Management System</p>
+    </div>
+
+    <!-- Error message -->
+    <div class="form-error" id="formError">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="errorText">学号或密码错误，请重试</span>
+    </div>
+
+    <!-- Form -->
+    <form id="loginForm" autocomplete="off" novalidate>
+      <!-- Student ID -->
+      <div class="form-group">
+        <label class="form-label" for="studentId">学号</label>
+        <div class="form-input-wrapper">
+          <input
+            type="text"
+            id="studentId"
+            class="form-input"
+            placeholder="请输入学号"
+            autocomplete="username"
+            maxlength="20"
+            required
+          >
+          <svg class="form-input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label" for="password">密码</label>
+        <div class="form-input-wrapper">
+          <input
+            type="password"
+            id="password"
+            class="form-input"
+            placeholder="请输入密码"
+            autocomplete="current-password"
+            required
+          >
+          <svg class="form-input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Remember & Forgot -->
+      <div class="form-row">
+        <label class="remember-me">
+          <input type="checkbox" id="remember">
+          <span>记住登录</span>
+        </label>
+        <a href="#" class="forgot-link">忘记密码？</a>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-login" id="loginBtn">
+        登 录
+        <div class="spinner"></div>
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="login-divider">
+      <span>其他方式登录</span>
+    </div>
+
+    <!-- Alternative login -->
+    <div class="alt-login">
+      <button class="alt-login-btn" title="统一身份认证">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>
+        </svg>
+        统一认证
+      </button>
+      <button class="alt-login-btn" title="短信验证码登录">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        短信登录
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="login-footer">
+    首次使用？请联系 <a href="#">教务处技术支持</a>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   LOGIN FORM INTERACTION LOGIC
+   ================================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  const form     = document.getElementById('loginForm');
+  const loginBtn = document.getElementById('loginBtn');
+  const errorEl  = document.getElementById('formError');
+  const errorTxt = document.getElementById('errorText');
+  const card     = document.getElementById('loginCard');
+
+  // ---- Ripple effect on button ----
+  loginBtn.addEventListener('click', function(e) {
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    const rect = this.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+    this.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  });
+
+  // ---- Form submit ----
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const studentId = document.getElementById('studentId').value.trim();
+    const password  = document.getElementById('password').value.trim();
+
+    // Simple validation
+    if (!studentId || !password) {
+      showError('请输入学号和密码');
+      return;
+    }
+
+    if (studentId.length < 6) {
+      showError('学号格式不正确');
+      return;
+    }
+
+    // Hide previous error
+    hideError();
+
+    // Show loading
+    loginBtn.classList.add('loading');
+
+    // Simulate login request (1.2s delay to feel realistic)
+    setTimeout(() => {
+      loginBtn.classList.remove('loading');
+
+      // Demo credentials: any non-empty with password length >= 3
+      // In real app this would be an API call
+      if (password.length >= 3) {
+        // Success — redirect to dashboard
+        window.location.href = 'index.html';
+      } else {
+        showError('学号或密码错误，请重试');
+      }
+    }, 1200);
+  });
+
+  function showError(msg) {
+    errorTxt.textContent = msg;
+    errorEl.classList.add('visible');
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 500);
+  }
+
+  function hideError() {
+    errorEl.classList.remove('visible');
+  }
+
+  // ---- Clear error on input ----
+  document.getElementById('studentId').addEventListener('input', hideError);
+  document.getElementById('password').addEventListener('input',  hideError);
+
+  // ---- Auto-focus first empty field ----
+  if (!document.getElementById('studentId').value) {
+    document.getElementById('studentId').focus();
+  }
+});
+</script>
+
+</body>
+</html>

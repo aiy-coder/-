@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="_shell.css">
+  <title>选课中心 - 高校教务系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* ================================================================
+   DESIGN TOKENS
+   ================================================================ */
+:root {
+  --color-primary-50:#EFF6FF;--color-primary-100:#DBEAFE;--color-primary-200:#BFDBFE;
+  --color-primary-300:#93C5FD;--color-primary-400:#60A5FA;--color-primary-500:#3B82F6;
+  --color-primary-600:#2563EB;--color-primary-700:#1D4ED8;--color-primary-800:#1E40AF;
+  --color-accent-50:#FFFBEB;--color-accent-100:#FEF3C7;--color-accent-200:#FDE68A;
+  --color-accent-300:#FCD34D;--color-accent-400:#FBBF24;--color-accent-500:#F59E0B;--color-accent-600:#D97706;
+  --color-neutral-50:#F8FAFC;--color-neutral-100:#F1F5F9;--color-neutral-200:#E2E8F0;
+  --color-neutral-300:#CBD5E1;--color-neutral-400:#94A3B8;--color-neutral-500:#64748B;
+  --color-neutral-600:#475569;--color-neutral-700:#334155;--color-neutral-800:#1E293B;--color-neutral-900:#0F172A;
+  --color-success-500:#10B981;--color-success-100:#D1FAE5;
+  --color-warning-500:#F59E0B;--color-warning-100:#FEF3C7;
+  --color-error-500:#EF4444;--color-error-100:#FEE2E2;
+  --font-sans:"Inter","PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,sans-serif;
+  --text-h2:1.25rem;--text-h3:1.125rem;--text-subtitle:1rem;--text-body:0.9375rem;--text-body-s:0.875rem;--text-caption:0.75rem;--text-overline:0.6875rem;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-full:9999px;
+  --shadow-card:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-card-hover:0 2px 4px rgba(15,23,42,0.06),0 8px 24px rgba(15,23,42,0.08),0 0 0 1px rgba(59,130,246,0.08);
+  --ease-out:cubic-bezier(0.4,0,0.2,1);--ease-elastic:cubic-bezier(0.34,1.56,0.64,1);
+  --ease-in-out:cubic-bezier(0.2,0,0,1);--duration-fast:150ms;--duration-normal:250ms;--duration-slow:350ms;
+  --topbar-height:56px;--sidebar-width:240px;--sidebar-collapsed:64px;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:var(--font-sans);background:var(--color-neutral-50);
+  color:var(--color-neutral-800);line-height:1.5;-webkit-font-smoothing:antialiased;
+  transition:background-color var(--duration-normal),color var(--duration-normal);
+}
+a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;}
+
+/* ================================================================
+   TOPBAR
+   ================================================================ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-height);
+  background:rgba(255,255,255,.85);backdrop-filter:blur(16px) saturate(180%);
+  -webkit-backdrop-filter:blur(16px) saturate(180%);
+  border-bottom:1px solid var(--color-neutral-200);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--space-5);z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:var(--space-4);min-width:0;}
+.hamburger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-600);}
+.hamburger:hover{background:var(--color-neutral-100);}
+.topbar-logo{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body);font-weight:700;color:var(--color-neutral-900);white-space:nowrap;}
+.topbar-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#FFF;flex-shrink:0;}
+.topbar-logo .logo-icon svg{width:16px;height:16px;}
+.breadcrumb{display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-caption);color:var(--color-neutral-400);white-space:nowrap;}
+.breadcrumb .current{color:var(--color-neutral-600);font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:var(--space-1);}
+.topbar-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-500);position:relative;transition:all var(--duration-fast);}
+.topbar-btn:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.topbar-btn svg{width:20px;height:20px;}
+.notification-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.user-menu{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);cursor:pointer;border:none;background:none;color:var(--color-neutral-800);font-family:var(--font-sans);font-size:var(--text-body-s);}
+.user-menu:hover{background:var(--color-neutral-100);}
+.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#FFF;font-size:13px;font-weight:600;flex-shrink:0;}
+.user-name{font-weight:500;white-space:nowrap;}
+
+/* ================================================================
+   SIDEBAR
+   ================================================================ */
+.sidebar{
+  position:fixed;top:var(--topbar-height);left:0;bottom:0;width:var(--sidebar-width);
+  background:#FFFFFF;border-right:1px solid var(--color-neutral-200);
+  display:flex;flex-direction:column;z-index:90;
+  transition:width var(--duration-slow) var(--ease-in-out),background-color var(--duration-normal);
+  overflow:hidden;
+}
+.sidebar.collapsed{width:var(--sidebar-collapsed);}
+.sidebar-nav{flex:1;padding:var(--space-3);display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;}
+.nav-item{
+  display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);
+  border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;
+  color:var(--color-neutral-600);transition:all var(--duration-fast);
+  white-space:nowrap;cursor:pointer;width:100%;text-align:left;font-family:var(--font-sans);
+  border:none;background:none;
+}
+.nav-item svg{width:20px;height:20px;flex-shrink:0;}
+.nav-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.nav-item.active{background:var(--color-primary-50);color:var(--color-primary-600);box-shadow:inset 3px 0 0 var(--color-primary-500);}
+.nav-item .badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.nav-divider{height:1px;background:var(--color-neutral-200);margin:var(--space-2) var(--space-3);}
+.sidebar-footer{padding:var(--space-3);border-top:1px solid var(--color-neutral-200);}
+.collapse-btn{display:flex;align-items:center;gap:var(--space-3);width:100%;padding:10px var(--space-3);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-500);cursor:pointer;white-space:nowrap;border:none;background:none;}
+.collapse-btn:hover{background:var(--color-neutral-100);}
+.collapse-btn svg{width:20px;height:20px;flex-shrink:0;}
+
+/* ================================================================
+   MAIN CONTENT
+   ================================================================ */
+.main-content{
+  margin-left:var(--sidebar-width);margin-top:var(--topbar-height);
+  padding:var(--space-6);min-height:calc(100vh - var(--topbar-height));
+  transition:margin-left var(--duration-slow) var(--ease-in-out);
+  display:flex;gap:var(--space-6);
+}
+.sidebar.collapsed ~ .main-content{margin-left:var(--sidebar-collapsed);}
+.content-primary{flex:1;min-width:0;}
+
+/* ================================================================
+   PAGE HEADER
+   ================================================================ */
+.page-header{margin-bottom:var(--space-5);}
+.page-header h1{font-size:var(--text-h2);font-weight:700;color:var(--color-neutral-900);margin-bottom:var(--space-1);}
+.page-header .subtitle{font-size:var(--text-body-s);color:var(--color-neutral-500);}
+.status-banner{
+  margin-bottom:var(--space-5);padding:var(--space-4) var(--space-5);
+  border-radius:var(--radius-lg);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;
+}
+.status-banner.open{background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.03));border:1px solid rgba(16,185,129,0.2);}
+.status-banner.closed{background:var(--color-error-100);border:1px solid rgba(239,68,68,0.2);}
+.status-banner.upcoming{background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.03));border:1px solid rgba(245,158,11,0.2);}
+.status-banner .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.status-banner.open .status-dot{background:var(--color-success-500);animation:pulse-dot 2s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.4);}50%{opacity:.6;box-shadow:0 0 0 8px rgba(16,185,129,0);}}
+.status-banner .status-text{font-size:var(--text-body-s);font-weight:600;}
+.status-banner.open .status-text{color:var(--color-success-500);}
+.status-banner .status-time{font-size:var(--text-caption);color:var(--color-neutral-500);}
+@keyframes pulse-badge{0%,100%{opacity:1;}50%{opacity:.35;}}
+@keyframes pulse-border{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.3);}50%{box-shadow:0 0 0 8px rgba(239,68,68,0);}}
+
+/* ================================================================
+   SEARCH & FILTER BAR
+   ================================================================ */
+.search-filter-bar{
+  background:#FFFFFF;border:1px solid var(--color-neutral-200);
+  border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);
+  margin-bottom:var(--space-5);box-shadow:var(--shadow-card);
+}
+.search-row{
+  display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap;
+}
+.search-input-wrap{
+  flex:1;min-width:200px;position:relative;
+}
+.search-input-wrap input{
+  width:100%;height:42px;padding:0 var(--space-4) 0 40px;
+  font-family:var(--font-sans);font-size:var(--text-body-s);
+  color:var(--color-neutral-800);background:var(--color-neutral-50);
+  border:1.5px solid var(--color-neutral-200);border-radius:var(--radius-md);
+  outline:none;transition:all var(--duration-fast);
+}
+.search-input-wrap input:focus{border-color:var(--color-primary-500);box-shadow:0 0 0 3px rgba(59,130,246,0.1);background:#FFF;}
+.search-input-wrap .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--color-neutral-400);pointer-events:none;}
+.filter-select{
+  height:42px;padding:0 36px 0 var(--space-4);
+  font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:500;
+  color:var(--color-neutral-700);background:#FFFFFF;
+  border:1.5px solid var(--color-neutral-200);border-radius:var(--radius-md);
+  outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  transition:all var(--duration-fast);
+}
+.filter-select:hover{border-color:var(--color-neutral-300);}
+.filter-select:focus{border-color:var(--color-primary-500);box-shadow:0 0 0 3px rgba(59,130,246,0.1);}
+.filter-chips{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3);}
+.filter-chip{
+  padding:4px 12px;border-radius:var(--radius-full);font-size:var(--text-caption);font-weight:500;
+  background:var(--color-neutral-50);color:var(--color-neutral-600);
+  border:1px solid var(--color-neutral-200);cursor:pointer;transition:all var(--duration-fast);
+  display:flex;align-items:center;gap:var(--space-1);
+}
+.filter-chip:hover{background:var(--color-primary-50);border-color:var(--color-primary-200);color:var(--color-primary-600);}
+.filter-chip.active{background:var(--color-primary-500);color:#FFF;border-color:var(--color-primary-500);}
+.filter-chip .chip-close{margin-left:2px;font-size:14px;line-height:1;opacity:.7;}
+.result-count{font-size:var(--text-caption);color:var(--color-neutral-400);margin-top:var(--space-2);}
+
+/* ================================================================
+   COURSE CARDS GRID
+   ================================================================ */
+.course-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  gap:var(--space-4);margin-bottom:var(--space-8);
+}
+.course-card{
+  background:#FFFFFF;border:1px solid var(--color-neutral-200);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  box-shadow:var(--shadow-card);transition:all var(--duration-normal);
+  cursor:pointer;position:relative;display:flex;flex-direction:column;
+}
+.course-card:hover{
+  box-shadow:var(--shadow-card-hover);border-color:var(--color-primary-300);
+  transform:translateY(-2px);
+}
+.course-card.in-cart{border-color:var(--color-primary-400);background:var(--color-primary-50);}
+.course-card.in-cart::after{content:'已加入购物车';position:absolute;top:12px;right:12px;padding:2px 10px;background:var(--color-primary-500);color:#FFF;font-size:10px;font-weight:600;border-radius:var(--radius-full);}
+.course-card .card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-3);}
+.course-card .course-code{font-size:11px;font-weight:600;color:var(--color-neutral-400);text-transform:uppercase;letter-spacing:.05em;}
+.course-card .course-name{font-size:var(--text-subtitle);font-weight:700;color:var(--color-neutral-800);margin-bottom:var(--space-3);line-height:1.3;}
+.course-card .course-meta{display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);flex:1;}
+.course-card .meta-row{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-s);color:var(--color-neutral-600);}
+.course-card .meta-row svg{width:14px;height:14px;color:var(--color-neutral-400);flex-shrink:0;}
+.course-card .card-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:var(--space-3);border-top:1px solid var(--color-neutral-100);}
+.seat-info{display:flex;align-items:center;gap:var(--space-2);}
+.seat-bar{width:60px;height:5px;background:var(--color-neutral-200);border-radius:var(--radius-full);overflow:hidden;}
+.seat-bar-fill{height:100%;border-radius:var(--radius-full);transition:width var(--duration-normal);}
+.seat-bar-fill.plenty{background:var(--color-success-500);}
+.seat-bar-fill.few{background:var(--color-warning-500);}
+.seat-bar-fill.urgent{background:var(--color-error-500);}
+.seat-text{font-size:var(--text-caption);font-weight:600;}
+.seat-text.plenty{color:var(--color-success-500);}
+.seat-text.few{color:var(--color-accent-600);}
+.seat-text.urgent{color:var(--color-error-500);}
+.card-actions{display:flex;gap:var(--space-2);}
+.btn-card{
+  padding:6px 14px;border-radius:var(--radius-sm);font-size:var(--text-caption);font-weight:600;
+  transition:all var(--duration-fast);white-space:nowrap;border:none;
+}
+.btn-add-cart{background:var(--color-primary-500);color:#FFF;}
+.btn-add-cart:hover{background:var(--color-primary-600);box-shadow:0 2px 8px rgba(59,130,246,0.3);}
+.btn-add-cart.in-cart-btn{background:var(--color-neutral-200);color:var(--color-neutral-500);}
+.btn-similar{background:#FFF;color:var(--color-neutral-500);border:1px solid var(--color-neutral-200);}
+.btn-similar:hover{background:var(--color-neutral-50);border-color:var(--color-neutral-300);}
+.conflict-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--color-error-100);color:var(--color-error-500);border-radius:var(--radius-full);font-size:10px;font-weight:600;}
+
+/* ================================================================
+   SHOPPING CART PANEL (right side)
+   ================================================================ */
+.cart-panel{
+  width:340px;flex-shrink:0;position:sticky;top:calc(var(--topbar-height) + var(--space-6));
+  align-self:flex-start;max-height:calc(100vh - var(--topbar-height) - var(--space-12));
+  display:flex;flex-direction:column;
+}
+.cart-card{
+  background:#FFFFFF;border:1px solid var(--color-primary-200);
+  border-radius:var(--radius-xl);box-shadow:0 4px 24px rgba(59,130,246,0.12);
+  display:flex;flex-direction:column;overflow:hidden;flex:1;
+}
+.cart-header{
+  padding:var(--space-5);background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);
+  color:#FFF;display:flex;align-items:center;justify-content:space-between;
+}
+.cart-header h3{font-size:var(--text-subtitle);font-weight:700;display:flex;align-items:center;gap:var(--space-2);}
+.cart-header .cart-count{font-size:var(--text-caption);opacity:.85;}
+.cart-body{flex:1;overflow-y:auto;padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);min-height:120px;}
+.cart-item{
+  display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);
+  background:var(--color-neutral-50);border-radius:var(--radius-md);
+  transition:all var(--duration-fast);
+}
+.cart-item:hover{background:var(--color-primary-50);}
+.cart-item .cart-item-priority{
+  width:24px;height:24px;border-radius:50%;background:var(--color-primary-500);color:#FFF;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;
+}
+.cart-item .cart-item-info{flex:1;min-width:0;}
+.cart-item .cart-item-name{font-size:var(--text-body-s);font-weight:600;color:var(--color-neutral-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cart-item .cart-item-meta{font-size:var(--text-caption);color:var(--color-neutral-500);}
+.cart-item .cart-item-remove{
+  width:28px;height:28px;border-radius:50%;border:none;background:none;
+  color:var(--color-neutral-400);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all var(--duration-fast);flex-shrink:0;
+}
+.cart-item .cart-item-remove:hover{background:var(--color-error-100);color:var(--color-error-500);}
+.cart-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--color-neutral-400);font-size:var(--text-body-s);padding:var(--space-6);
+}
+.cart-empty svg{width:48px;height:48px;margin-bottom:var(--space-3);opacity:.4;}
+.cart-footer{padding:var(--space-4) var(--space-5);border-top:1px solid var(--color-neutral-100);}
+.cart-summary{font-size:var(--text-caption);color:var(--color-neutral-500);margin-bottom:var(--space-3);}
+.cart-summary strong{color:var(--color-neutral-800);}
+.cart-conflicts{margin-bottom:var(--space-3);}
+.cart-conflict-item{font-size:var(--text-caption);color:var(--color-error-500);display:flex;align-items:center;gap:var(--space-1);padding:var(--space-1) 0;}
+
+/* CTA button */
+.btn-cta{
+  width:100%;height:48px;font-family:var(--font-sans);font-size:var(--text-subtitle);font-weight:700;
+  color:#FFF;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);
+  border:none;border-radius:var(--radius-md);cursor:pointer;
+  box-shadow:0 4px 16px rgba(59,130,246,0.35);
+  transition:all var(--duration-normal) var(--ease-elastic);
+  display:flex;align-items:center;justify-content:center;gap:var(--space-2);
+  position:relative;overflow:hidden;
+}
+.btn-cta:hover{box-shadow:0 6px 24px rgba(59,130,246,0.45);transform:scale(1.02);}
+.btn-cta:active{transform:scale(.97);box-shadow:0 2px 8px rgba(59,130,246,0.3);transition:all .05s;}
+.btn-cta:disabled{background:var(--color-neutral-300);box-shadow:none;cursor:not-allowed;transform:none;}
+.btn-cta .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.3);transform:scale(0);animation:ripple-anim .6s ease-out;pointer-events:none;}
+@keyframes ripple-anim{to{transform:scale(4);opacity:0;}}
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+.toast-container{position:fixed;top:calc(var(--topbar-height) + var(--space-4));right:var(--space-6);z-index:200;display:flex;flex-direction:column;gap:var(--space-2);}
+.toast{
+  padding:var(--space-3) var(--space-5);border-radius:var(--radius-md);
+  font-size:var(--text-body-s);font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,0.15);
+  animation:slideIn .3s var(--ease-out);display:flex;align-items:center;gap:var(--space-2);
+  max-width:360px;
+}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.toast.success{background:var(--color-success-500);color:#FFF;}
+.toast.error{background:var(--color-error-500);color:#FFF;}
+.toast.warning{background:var(--color-warning-500);color:#FFF;}
+
+/* ================================================================
+   SIDEBAR OVERLAY
+   ================================================================ */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:85;opacity:0;transition:opacity var(--duration-normal);}
+.sidebar-overlay.show{display:block;opacity:1;}
+
+/* ================================================================
+   DARK MODE
+   ================================================================ */
+body.dark{
+  --color-neutral-50:#0F172A;--color-neutral-100:#1E293B;--color-neutral-200:#334155;
+  --color-neutral-300:#475569;--color-neutral-400:#64748B;--color-neutral-500:#94A3B8;
+  --color-neutral-600:#CBD5E1;--color-neutral-700:#E2E8F0;--color-neutral-800:#F1F5F9;
+  --color-neutral-900:#F8FAFC;
+  --color-primary-50:rgba(59,130,246,0.15);
+}
+body.dark .topbar{background:rgba(15,23,42,.85);}
+body.dark .sidebar,body.dark .search-filter-bar,body.dark .course-card,
+body.dark .cart-card{background:#1E293B;}
+body.dark .course-card.in-cart{background:rgba(59,130,246,0.12);}
+body.dark .filter-select{background-color:#1E293B;}
+body.dark .cart-item{background:rgba(255,255,255,.04);}
+body.dark .cart-item:hover{background:rgba(59,130,246,0.1);}
+body.dark .search-input-wrap input{background:rgba(255,255,255,.04);color:var(--color-neutral-800);}
+body.dark .search-input-wrap input:focus{background:#1E293B;}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media(max-width:1200px){
+  .cart-panel{width:300px;}
+  .course-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));}
+}
+@media(max-width:1024px){
+  .sidebar{width:var(--sidebar-collapsed);}
+  .sidebar .nav-item span,.sidebar .nav-item .badge,
+  .sidebar .nav-divider,.sidebar .collapse-btn span{display:none;}
+  .sidebar .nav-item{justify-content:center;padding:10px;}
+  .sidebar:not(.mobile-open) .collapse-btn{display:none;}
+  .main-content{margin-left:var(--sidebar-collapsed) !important;}
+  .hamburger{display:flex;}
+  .cart-panel{position:fixed;right:0;top:var(--topbar-height);bottom:0;z-index:80;
+    transform:translateX(100%);transition:transform var(--duration-slow) var(--ease-out);}
+  .cart-panel.mobile-open{transform:translateX(0);}
+  .cart-toggle-fab{
+    display:flex !important;position:fixed;bottom:24px;right:24px;z-index:81;
+    width:56px;height:56px;border-radius:50%;background:var(--color-primary-500);
+    color:#FFF;align-items:center;justify-content:center;border:none;
+    box-shadow:0 4px 16px rgba(59,130,246,0.4);cursor:pointer;
+  }
+  .cart-toggle-fab .fab-badge{position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:700;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:var(--sidebar-width);z-index:95;}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .sidebar.mobile-open .nav-item{justify-content:flex-start;padding:10px var(--space-3);}
+  .sidebar.mobile-open .nav-item span,.sidebar.mobile-open .nav-item .badge,
+  .sidebar.mobile-open .nav-divider,.sidebar.mobile-open .collapse-btn span{display:inline;}
+  .main-content{margin-left:0 !important;padding:var(--space-3);flex-direction:column;}
+  .user-name{display:none;}
+  .breadcrumb{display:none;}
+  .course-grid{grid-template-columns:1fr;}
+  .search-row{gap:var(--space-2);}
+  .filter-select{flex:1;min-width:0;}
+  .cart-panel{width:100%;max-width:100%;}
+  .cart-toggle-fab{bottom:16px;right:16px;}
+}
+
+
+.user-menu-wrap{position:relative;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:210px;background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);box-shadow:0 10px 40px rgba(15,23,42,0.14);padding:var(--space-2);z-index:200;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s var(--ease-out);}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);cursor:pointer;transition:all var(--duration-fast);border:none;background:none;width:100%;text-align:left;font-family:var(--font-sans);}
+.dropdown-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.dropdown-item svg{width:18px;height:18px;color:var(--color-neutral-400);flex-shrink:0;}
+.dropdown-item.danger{color:var(--color-error-500);}.dropdown-item.danger:hover{background:var(--color-error-100);}
+.dropdown-divider{height:1px;background:var(--color-neutral-100);margin:var(--space-1) 0;}
+body.dark .user-dropdown{background:#1E293B;border-color:var(--color-neutral-200);}
+body.dark .dropdown-item:hover{background:rgba(255,255,255,.06);}
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     TOPBAR
+     ================================================================ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="topbar-logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg></div>教务系统</a>
+    <nav class="breadcrumb"><a href="index.html">首页</a><span>/</span><span class="current">选课中心</span></nav>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="darkModeToggle" title="暗黑模式">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" id="darkIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <a href="notifications.html" class="topbar-btn" style="position:relative;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notification-count" id="topNotifCount">3</span></a>
+    <div class="user-menu-wrap"><button class="user-menu" id="userMenuBtn"><div class="user-avatar">李</div><span class="user-name">李小宇</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="personal.html" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人信息</a>
+        <a href="#" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a href="login.html" class="dropdown-item danger"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================================================================
+     SIDEBAR
+     ================================================================ -->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>首页仪表盘</span></a>
+    <a href="schedule.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>课表</span></a>
+    <button class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>选课中心</span></button>
+    <a href="grades.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>成绩查询</span></a>
+    <a href="notifications.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>校园通知</span><span class="badge" id="sidebarBadge">3</span></a>
+    <a href="exams.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span>考试安排</span></a>
+    <div class="nav-divider"></div>
+    <a href="training.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg>
+      <span>培养方案</span>
+    </a>
+    <a href="payment.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>缴费查询</span>
+    </a>
+    <a href="resources.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>教学资源</span>
+    </a>
+    <a href="evaluation.html" class="nav-item">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>教学评价</span>
+    </a>
+    <a href="settings.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+  </nav>
+  <div class="sidebar-footer"><button class="collapse-btn" id="collapseBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>折叠菜单</span></button></div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ================================================================
+     MAIN CONTENT
+     ================================================================ -->
+<div class="main-content">
+
+  <div class="content-primary">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>📝 选课中心</h1>
+      <p class="subtitle">2026-2027学年第一学期 · 选课阶段：初选</p>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="status-banner open" id="statusBanner">
+      <span class="status-dot"></span>
+      <span class="status-text">🟢 选课系统开放中</span>
+      <span class="status-time">开放时间：2026年6月10日 09:00 — 6月20日 23:59</span>
+      <span style="margin-left:auto;font-size:var(--text-caption);color:var(--color-neutral-500);" id="countdown"></span>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="search-filter-bar">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="搜索课程名称、教师、代码…">
+        </div>
+        <select class="filter-select" id="filterDept">
+          <option value="">全部学院</option><option value="cs">计算机科学与技术学院</option>
+          <option value="math">数学与统计学院</option><option value="eng">外国语学院</option>
+          <option value="phys">物理学院</option><option value="art">艺术学院</option>
+        </select>
+        <select class="filter-select" id="filterType">
+          <option value="">全部类型</option><option value="required">通识必修</option><option value="major">专业必修</option><option value="major-elective">专业选修</option><option value="general">通识选修</option>
+        </select>
+        <select class="filter-select" id="filterTime">
+          <option value="">全部时间</option><option value="mon">周一</option><option value="tue">周二</option><option value="wed">周三</option><option value="thu">周四</option><option value="fri">周五</option>
+        </select>
+      </div>
+      <div class="filter-chips" id="filterChips">
+        <button class="filter-chip active" data-credit="all">全部学分</button>
+        <button class="filter-chip" data-credit="1-2">1-2 学分</button>
+        <button class="filter-chip" data-credit="3-4">3-4 学分</button>
+        <button class="filter-chip" data-credit="5">5+ 学分</button>
+        <button class="filter-chip" id="chipHasSeat">有余量</button>
+        <button class="filter-chip" id="chipNoConflict">无冲突</button>
+      </div>
+      <div class="result-count" id="resultCount">共 12 门课程</div>
+    </div>
+
+    <!-- Course Grid -->
+    <div class="course-grid" id="courseGrid"></div>
+  </div>
+
+  <!-- ================================================================
+       SHOPPING CART PANEL
+       ================================================================ -->
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-card">
+      <div class="cart-header">
+        <h3>🛒 选课购物车</h3>
+        <span class="cart-count" id="cartCount">0/4 门</span>
+      </div>
+      <div class="cart-body" id="cartBody">
+        <div id="cartItemList"></div>
+        <div class="cart-empty" id="cartEmpty">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <p>点击课程卡片上的"加入购物车"<br>将心仪课程添加到此处</p>
+          <p style="font-size:var(--text-caption);margin-top:var(--space-2);">💡 选课开放后可一键提交</p>
+        </div>
+      </div>
+      <div class="cart-footer">
+        <div class="cart-conflicts" id="cartConflicts"></div>
+        <div class="cart-summary" id="cartSummary">已选 <strong>0</strong> 门课程，共 <strong>0</strong> 学分</div>
+        <button class="btn-cta" id="btnSubmitCart" disabled>🚀 一键提交购物车</button>
+        <button class="btn-cta" id="btnUndoSubmit" style="display:none;background:var(--color-neutral-500);box-shadow:none;margin-top:8px;" onclick="undoSubmit()">↩️ 取消提交，退回购物车</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile FAB for cart -->
+  <button class="cart-toggle-fab" id="cartFab" style="display:none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span class="fab-badge" id="fabBadge">0</span>
+  </button>
+
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ================================================================
+   COURSE DATA
+   ================================================================ */
+const ALL_COURSES = [
+  { id:'cs301',code:'CS301',name:'算法设计与分析',teacher:'李建国 教授',dept:'cs',type:'major',credits:4, day:2,period:'3-4节',time:'周二 10:00-12:00',room:'教三楼 201',seats:32,totalSeats:60,weeks:'1-16周',examType:'闭卷考试',rating:4.5,tags:['热门','核心'] },
+  { id:'cs302',code:'CS302',name:'机器学习导论',teacher:'赵强 讲师',dept:'cs',type:'major-elective',credits:3, day:3,period:'5-6节',time:'周三 14:00-15:40',room:'机房 3',seats:8,totalSeats:40,weeks:'1-16周',examType:'项目考核',rating:4.8,tags:['AI','热门'] },
+  { id:'cs303',code:'CS303',name:'计算机网络',teacher:'周明 副教授',dept:'cs',type:'major',credits:3.5, day:1,period:'1-2节',time:'周一 08:00-09:40',room:'教三楼 305',seats:45,totalSeats:70,weeks:'1-16周',examType:'闭卷考试',rating:4.2,tags:['核心'] },
+  { id:'cs304',code:'CS304',name:'数据库原理',teacher:'吴刚 教授',dept:'cs',type:'major',credits:3, day:4,period:'3-4节',time:'周四 10:00-12:00',room:'教三楼 201',seats:50,totalSeats:80,weeks:'1-16周',examType:'闭卷考试',rating:4.0,tags:['核心'] },
+  { id:'eng401',code:'ENG401',name:'学术英语写作',teacher:'王芳 副教授',dept:'eng',type:'general',credits:2, day:1,period:'5-6节',time:'周一 14:00-15:40',room:'教一楼 503',seats:15,totalSeats:35,weeks:'1-12周',examType:'论文考核',rating:4.3,tags:['实用'] },
+  { id:'eng402',code:'ENG402',name:'英语口语强化',teacher:'James Wilson',dept:'eng',type:'general',credits:2, day:3,period:'1-2节',time:'周三 08:00-09:40',room:'教一楼 505',seats:5,totalSeats:25,weeks:'1-16周',examType:'口语考试',rating:4.7,tags:['外教','热门'] },
+  { id:'math301',code:'MATH301',name:'概率论与数理统计',teacher:'陈明 副教授',dept:'math',type:'required',credits:5, day:2,period:'1-2节',time:'周二 08:00-09:40',room:'教一楼 201',seats:60,totalSeats:90,weeks:'1-16周',examType:'闭卷考试',rating:3.8,tags:['核心','高学分'] },
+  { id:'math302',code:'MATH302',name:'线性代数(进阶)',teacher:'孙立 教授',dept:'math',type:'major-elective',credits:3, day:5,period:'1-2节',time:'周五 08:00-09:40',room:'教一楼 301',seats:28,totalSeats:45,weeks:'1-16周',examType:'闭卷考试',rating:4.1,tags:['进阶'] },
+  { id:'phys201',code:'PHYS201',name:'量子物理导论',teacher:'张伟 讲师',dept:'phys',type:'general',credits:2, day:4,period:'7-8节',time:'周四 16:00-17:40',room:'理综楼 A2',seats:40,totalSeats:50,weeks:'1-16周',examType:'开卷考试',rating:4.4,tags:['科普'] },
+  { id:'art101',code:'ART101',name:'摄影基础',teacher:'周艺 讲师',dept:'art',type:'general',credits:2, day:5,period:'9-10节',time:'周五 19:00-20:40',room:'教五楼 301',seats:3,totalSeats:30,weeks:'1-12周',examType:'作品考核',rating:4.9,tags:['热门','艺术'] },
+  { id:'art102',code:'ART102',name:'中国书法鉴赏',teacher:'黄明 教授',dept:'art',type:'general',credits:1.5, day:3,period:'9-10节',time:'周三 19:00-20:40',room:'教五楼 201',seats:18,totalSeats:40,weeks:'1-8周',examType:'作品考核',rating:4.6,tags:['艺术','轻松'] },
+  { id:'cs305',code:'CS305',name:'软件工程',teacher:'郑远 教授',dept:'cs',type:'major',credits:3, day:1,period:'3-4节',time:'周一 10:00-12:00',room:'教三楼 301',seats:35,totalSeats:60,weeks:'1-16周',examType:'项目考核',rating:4.0,tags:['核心'] },
+];
+
+// ================================================================
+// STATE
+// ================================================================
+let cart = [];
+let submittedIds = []; // course IDs that were submitted (for undo)
+let activeFilters = { dept:'', type:'', time:'', credit:'all', hasSeat:false, noConflict:false };
+let searchQuery = '';
+
+// ================================================================
+// DEBOUNCE UTILITY
+// ================================================================
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+// ================================================================
+// CHECK CONFLICTS
+// ================================================================
+function hasConflict(course, cartCourses) {
+  return cartCourses.some(c =>
+    c.day === course.day &&
+    ((course.period === c.period) ||
+     (course.period === '3-4节' && c.period === '1-2节') ||
+     (course.period === '1-2节' && c.period === '3-4节') ||
+     (course.period === '5-6节' && c.period === '3-4节') ||
+     (course.period === '3-4节' && c.period === '5-6节'))
+  );
+}
+
+function getCartConflicts() {
+  const conflicts = [];
+  for (let i = 0; i < cart.length; i++) {
+    for (let j = i + 1; j < cart.length; j++) {
+      if (hasConflict(cart[i], [cart[j]])) {
+        conflicts.push({ a: cart[i], b: cart[j] });
+      }
+    }
+  }
+  return conflicts;
+}
+
+// ================================================================
+// RENDER COURSE GRID
+// ================================================================
+function renderCourses() {
+  const grid = document.getElementById('courseGrid');
+  let filtered = ALL_COURSES.filter(c => {
+    if (activeFilters.dept && c.dept !== activeFilters.dept) return false;
+    if (activeFilters.type && c.type !== activeFilters.type) return false;
+    if (activeFilters.time) {
+      const dayMap = { mon:1, tue:2, wed:3, thu:4, fri:5 };
+      if (c.day !== dayMap[activeFilters.time]) return false;
+    }
+    if (activeFilters.credit !== 'all') {
+      const [lo, hi] = activeFilters.credit.split('-').map(Number);
+      if (hi) { if (c.credits < lo || c.credits > hi) return false; }
+      else { if (c.credits < lo) return false; }
+    }
+    if (activeFilters.hasSeat && c.seats <= 0) return false;
+    if (activeFilters.noConflict && hasConflict(c, cart)) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!c.name.toLowerCase().includes(q) && !c.teacher.toLowerCase().includes(q) && !c.code.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('resultCount').textContent = `共 ${filtered.length} 门课程`;
+
+  grid.innerHTML = filtered.map(c => {
+    const inCart = cart.some(ci => ci.id === c.id);
+    const conflict = !inCart && hasConflict(c, cart);
+    const seatPct = Math.round((c.seats / c.totalSeats) * 100);
+    let seatLevel = 'plenty';
+    if (c.seats <= 5) seatLevel = 'urgent';
+    else if (seatPct < 30) seatLevel = 'few';
+
+    return `
+    <div class="course-card${inCart ? ' in-cart' : ''}" id="card-${c.id}">
+      <div class="card-top">
+        <span class="course-code">${c.code}</span>
+        <span style="display:flex;gap:2px;font-size:12px;color:var(--color-accent-400);">${'★'.repeat(Math.floor(c.rating))}${c.rating%1>=0.5?'½':''}</span>
+      </div>
+      <div class="course-name">${c.name}${c.tags.map(t => `<span style="font-size:10px;font-weight:500;color:var(--color-primary-500);background:var(--color-primary-50);padding:1px 6px;border-radius:3px;margin-left:4px;">${t}</span>`).join('')}</div>
+      <div class="course-meta">
+        <div class="meta-row"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${c.teacher}</div>
+        <div class="meta-row"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${c.time}</div>
+        <div class="meta-row"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${c.room}</div>
+        <div class="meta-row"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>${c.credits} 学分 · ${c.weeks}</div>
+      </div>
+      ${conflict ? `<div class="conflict-badge" style="margin-bottom:var(--space-3);">⚠️ 与购物车中课程时间冲突</div>` : ''}
+      <div class="card-bottom">
+        <div class="seat-info">
+          <div class="seat-bar"><div class="seat-bar-fill ${seatLevel}" style="width:${Math.max(5, seatPct)}%"></div></div>
+          <span class="seat-text ${seatLevel}">余 ${c.seats}/${c.totalSeats}</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn-card btn-similar" data-action="similar" data-id="${c.id}">找相似</button>
+          <button class="btn-card btn-add-cart${inCart ? ' in-cart-btn' : ''}" data-action="${inCart ? 'remove' : 'add'}" data-id="${c.id}"${(!inCart && c.seats <= 0) ? ' disabled style="opacity:.5;cursor:not-allowed;"' : ''}>
+            ${inCart ? '退选' : (c.seats <= 0 ? '已满' : '+ 加入购物车')}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Attach event listeners
+  grid.querySelectorAll('.btn-card').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const action = this.dataset.action;
+      const id = this.dataset.id;
+      if (action === 'add') addToCart(id);
+      else if (action === 'remove') removeFromCart(id);
+      else if (action === 'similar') findSimilar(id);
+    });
+  });
+}
+
+// ================================================================
+// CART OPERATIONS
+// ================================================================
+function persistState() {
+  localStorage.setItem('courseCart', JSON.stringify(cart.map(function(c){ return c.id; })));
+  localStorage.setItem('submittedIds', JSON.stringify(submittedIds));
+  var sm = {}; ALL_COURSES.forEach(function(c){ sm[c.id] = c.seats; });
+  localStorage.setItem('courseSeats', JSON.stringify(sm));
+}
+function restoreState() {
+  try {
+    var ids = JSON.parse(localStorage.getItem('courseCart') || '[]');
+    cart = ids.map(function(id){ return ALL_COURSES.find(function(c){ return c.id === id; }); }).filter(Boolean);
+    submittedIds = JSON.parse(localStorage.getItem('submittedIds') || '[]');
+    var sm = JSON.parse(localStorage.getItem('courseSeats') || '{}');
+    ALL_COURSES.forEach(function(c){ if (sm[c.id] !== undefined) c.seats = sm[c.id]; });
+  } catch(e) { cart = []; submittedIds = []; }
+}
+
+function addToCart(id) {
+  var course = ALL_COURSES.find(function(c){ return c.id === id; });
+  if (!course) return;
+  if (cart.some(function(c){ return c.id === id; })) return;
+  if (cart.length >= 4) { showToast('购物车最多只能添加 4 门课程', 'warning'); return; }
+  if (hasConflict(course, cart)) { showToast('⚠️ 该课程与购物车中已有课程时间冲突', 'warning'); }
+  cart.push(course);
+  persistState();
+  showToast('✅ 「' + course.name + '」已加入购物车', 'success');
+  updateAll();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(function(c){ return c.id !== id; });
+  persistState();
+  updateAll();
+}
+
+function findSimilar(id) {
+  var course = ALL_COURSES.find(function(c){ return c.id === id; });
+  if (!course) return;
+  var similar = ALL_COURSES.filter(function(c){
+    return c.id !== id && (c.dept === course.dept || c.type === course.type) && !cart.some(function(ci){ return ci.id === c.id; });
+  }).slice(0, 3);
+  if (similar.length === 0) { showToast('暂未找到相似课程', 'warning'); return; }
+  showToast('💡 推荐: ' + similar.map(function(s){ return s.name; }).join('、'), 'success');
+}
+
+function submitCart() {
+  if (cart.length === 0) return;
+  var btn = document.getElementById('btnSubmitCart');
+  btn.classList.add('loading'); btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#FFF;border-radius:50%;animation:spin .7s linear infinite;"></span> 提交中…';
+
+  setTimeout(function() {
+    var ok = [], fail = [];
+    cart.forEach(function(c) {
+      if (Math.random() > 0.2) { ok.push(c); } else { fail.push(c); }
+    });
+    ok.forEach(function(c) {
+      var co = ALL_COURSES.find(function(x){ return x.id === c.id; });
+      if (co && co.seats > 0) { co.seats -= 1; submittedIds.push(c.id); }
+    });
+    persistState();
+    btn.classList.remove('loading'); btn.disabled = false;
+    btn.innerHTML = '🚀 一键提交购物车';
+
+    if (fail.length === 0 && ok.length > 0) {
+      showToast('🎉 全部抢课成功！' + ok.map(function(c){ return c.name; }).join('、') + ' 已选上', 'success');
+      cart = [];
+    } else if (ok.length === 0) {
+      showToast('❌ 抢课失败，请检查网络后重试', 'error');
+    } else {
+      showToast('⚠️ 部分成功：' + ok.map(function(c){ return c.name; }).join('、') + ' 已选上；' + fail.map(function(c){ return c.name; }).join('、') + ' 已满员', 'warning');
+      cart = fail;
+    }
+    persistState();
+    updateAll();
+  }, 1500);
+}
+
+function undoSubmit() {
+  if (submittedIds.length === 0) return;
+  submittedIds.forEach(function(id) {
+    var co = ALL_COURSES.find(function(c){ return c.id === id; });
+    if (co) { co.seats += 1; cart.push(co); }
+  });
+  submittedIds = [];
+  persistState();
+  showToast('↩️ 已取消提交，课程已退回购物车', 'success');
+  updateAll();
+}
+
+// ================================================================
+// RENDER CART
+// ================================================================
+function renderCart() {
+  var body = document.getElementById('cartBody');
+  var empty = document.getElementById('cartEmpty');
+  var listEl = document.getElementById('cartItemList');
+  var count = document.getElementById('cartCount');
+  var summary = document.getElementById('cartSummary');
+  var conflictsEl = document.getElementById('cartConflicts');
+  var submitBtn = document.getElementById('btnSubmitCart');
+  var badge = document.getElementById('fabBadge');
+  var undoBtn = document.getElementById('btnUndoSubmit');
+
+  count.textContent = cart.length + '/4 门';
+  badge.textContent = cart.length;
+  var totalCredits = cart.reduce(function(s, c){ return s + c.credits; }, 0);
+  summary.innerHTML = '已选 <strong>' + cart.length + '</strong> 门课程，共 <strong>' + totalCredits + '</strong> 学分';
+  if (undoBtn) undoBtn.style.display = (submittedIds.length > 0) ? '' : 'none';
+
+  if (cart.length === 0) {
+    empty.style.display = '';
+    if (listEl) listEl.innerHTML = '';
+    submitBtn.disabled = true;
+    conflictsEl.innerHTML = '';
+  } else {
+    empty.style.display = 'none';
+    submitBtn.disabled = false;
+    var html = '';
+    cart.forEach(function(c, i){
+      html += '<div class="cart-item"><div class="cart-item-priority">' + (i+1) + '</div><div class="cart-item-info"><div class="cart-item-name">' + c.name + '</div><div class="cart-item-meta">' + c.time + ' · ' + c.credits + '学分</div></div><button class="cart-item-remove" data-rid="' + c.id + '" title="退选"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>';
+    });
+    if (listEl) { listEl.innerHTML = html; } else { empty.insertAdjacentHTML('beforebegin', '<div id="cartItemList">' + html + '</div>'); }
+
+    // Conflicts
+    var conflicts = getCartConflicts();
+    if (conflicts.length > 0) {
+      conflictsEl.innerHTML = conflicts.map(function(cf){ return '<div class="cart-conflict-item">⚠️ 「' + cf.a.name + '」与「' + cf.b.name + '」时间冲突</div>'; }).join('');
+    } else if (cart.length >= 2) {
+      conflictsEl.innerHTML = '<div style="font-size:var(--text-caption);color:var(--color-success-500);">✅ 课程时间无冲突</div>';
+    } else { conflictsEl.innerHTML = ''; }
+  }
+
+  // Remove handlers
+  body.querySelectorAll('.cart-item-remove').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var rid = this.getAttribute('data-rid');
+      if (rid) removeFromCart(rid);
+    });
+  });
+}
+
+function updateAll() {
+  renderCart();
+  renderCourses();
+}
+
+// ================================================================
+// TOAST
+// ================================================================
+function showToast(msg, type) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 300); }, 2500);
+}
+
+// ================================================================
+// SEARCH & FILTER HANDLERS
+// ================================================================
+document.getElementById('searchInput').addEventListener('input', debounce(function() {
+  searchQuery = this.value;
+  renderCourses();
+}, 250));
+
+document.getElementById('filterDept').addEventListener('change', function() {
+  activeFilters.dept = this.value;
+  renderCourses();
+});
+document.getElementById('filterType').addEventListener('change', function() {
+  activeFilters.type = this.value;
+  renderCourses();
+});
+document.getElementById('filterTime').addEventListener('change', function() {
+  activeFilters.time = this.value;
+  renderCourses();
+});
+
+document.querySelectorAll('.filter-chip[data-credit]').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.filter-chip[data-credit]').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    activeFilters.credit = this.dataset.credit;
+    renderCourses();
+  });
+});
+
+document.getElementById('chipHasSeat').addEventListener('click', function() {
+  this.classList.toggle('active');
+  activeFilters.hasSeat = this.classList.contains('active');
+  renderCourses();
+});
+
+document.getElementById('chipNoConflict').addEventListener('click', function() {
+  this.classList.toggle('active');
+  activeFilters.noConflict = this.classList.contains('active');
+  renderCourses();
+});
+
+// ================================================================
+// SUBMIT BUTTON WITH DEBOUNCE
+// ================================================================
+const debouncedSubmit = debounce(submitCart, 500);
+document.getElementById('btnSubmitCart').addEventListener('click', function(e) {
+  // Ripple
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const rect = this.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+  this.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove());
+  debouncedSubmit();
+});
+
+// ================================================================
+// SIDEBAR & DARK MODE
+// ================================================================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('collapseBtn').addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+
+const hamburger = document.getElementById('hamburgerBtn');
+const overlay = document.getElementById('sidebarOverlay');
+function closeSidebar() { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); }
+hamburger.addEventListener('click', () => {
+  sidebar.classList.contains('mobile-open') ? closeSidebar() : (sidebar.classList.add('mobile-open'), overlay.classList.add('show'));
+});
+overlay.addEventListener('click', closeSidebar);
+
+const darkToggle = document.getElementById('darkModeToggle');
+const darkIcon = document.getElementById('darkIcon');
+function setDarkMode(on) {
+  document.body.classList.toggle('dark', on);
+  darkIcon.innerHTML = on
+    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  localStorage.setItem('theme', on ? 'dark' : 'light');
+}
+darkToggle.addEventListener('click', () => setDarkMode(!document.body.classList.contains('dark')));
+if (localStorage.getItem('theme') === 'dark') setDarkMode(true);
+
+// Mobile cart toggle
+const cartFab = document.getElementById('cartFab');
+const cartPanel = document.getElementById('cartPanel');
+cartFab.addEventListener('click', () => {
+  cartPanel.classList.toggle('mobile-open');
+});
+
+// Close sidebar on nav click (mobile)
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+  item.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); });
+});
+
+// ================================================================
+// COUNTDOWN TIMER (demo: 8 days remaining)
+// ================================================================
+function updateCountdown() {
+  var end = new Date(2026, 5, 20, 23, 59, 59);
+  var now = new Date();
+  var diff = end - now;
+  var banner = document.getElementById('statusBanner');
+  if (diff <= 0) {
+    document.getElementById('countdown').textContent = '已结束';
+    banner.className = 'status-banner closed';
+    banner.querySelector('.status-text').textContent = '🔴 选课已结束';
+    return;
+  }
+  var days = Math.floor(diff / 86400000);
+  var hours = Math.floor((diff % 86400000) / 3600000);
+  var mins = Math.floor((diff % 3600000) / 60000);
+  var countEl = document.getElementById('countdown');
+  // Urgent: less than 1 hour → red pulse
+  if (diff < 3600000) {
+    countEl.innerHTML = '<span style="animation:pulse-badge 0.8s ease-in-out infinite;color:var(--color-error-500);font-weight:700;">⏰ 仅剩 ' + mins + ' 分钟！</span>';
+    banner.style.animation = 'pulse-border 1.5s ease-in-out infinite';
+  } else if (diff < 86400000) {
+    countEl.textContent = '剩余 ' + hours + ' 小时 ' + mins + ' 分钟';
+    countEl.style.color = 'var(--color-error-500)';
+    countEl.style.fontWeight = '700';
+  } else {
+    countEl.textContent = '剩余 ' + days + ' 天 ' + hours + ' 小时';
+    countEl.style.color = '';
+    countEl.style.fontWeight = '';
+  }
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ================================================================
+// INIT
+// ================================================================
+// ---- Badge persistence across pages ----
+(function initBadges() {
+  var count = parseInt(localStorage.getItem('unreadCount') || '3');
+  var topBadge = document.getElementById('topNotifCount');
+  var sideBadge = document.getElementById('sidebarBadge');
+  [topBadge, sideBadge].forEach(function(el) {
+    if (!el) return;
+    el.textContent = count;
+    el.style.display = count > 0 ? '' : 'none';
+  });
+})();
+
+restoreState();
+updateAll();
+var um=document.getElementById("userMenuBtn"),ud=document.getElementById("userDropdown");if(um&&ud){um.addEventListener("click",function(e){e.stopPropagation();ud.classList.toggle("show");});document.addEventListener("click",function(){ud.classList.remove("show");});}var savedName=localStorage.getItem("userName");if(savedName){var un=document.querySelector(".user-name");if(un)un.textContent=savedName;var av=document.querySelector(".user-avatar");if(av)av.textContent=savedName.charAt(0);}</script>
+<script src="_shared.js"></script>
+</body>
+</html>
