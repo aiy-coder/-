@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="_shell.css">
+  <title>校园通知 - 高校教务系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* ================================================================
+   DESIGN TOKENS
+   ================================================================*/
+:root {
+  --color-primary-50:#EFF6FF;--color-primary-100:#DBEAFE;--color-primary-200:#BFDBFE;
+  --color-primary-300:#93C5FD;--color-primary-400:#60A5FA;--color-primary-500:#3B82F6;
+  --color-primary-600:#2563EB;--color-primary-700:#1D4ED8;
+  --color-accent-50:#FFFBEB;--color-accent-100:#FEF3C7;--color-accent-200:#FDE68A;
+  --color-accent-300:#FCD34D;--color-accent-400:#FBBF24;--color-accent-500:#F59E0B;--color-accent-600:#D97706;
+  --color-neutral-50:#F8FAFC;--color-neutral-100:#F1F5F9;--color-neutral-200:#E2E8F0;
+  --color-neutral-300:#CBD5E1;--color-neutral-400:#94A3B8;--color-neutral-500:#64748B;
+  --color-neutral-600:#475569;--color-neutral-700:#334155;--color-neutral-800:#1E293B;--color-neutral-900:#0F172A;
+  --color-success-500:#10B981;--color-success-100:#D1FAE5;
+  --color-warning-500:#F59E0B;--color-warning-100:#FEF3C7;
+  --color-error-500:#EF4444;--color-error-100:#FEE2E2;
+  --font-sans:"Inter","PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,sans-serif;
+  --text-h2:1.25rem;--text-h3:1.125rem;--text-subtitle:1rem;--text-body:0.9375rem;--text-body-s:0.875rem;--text-caption:0.75rem;--text-overline:0.6875rem;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-full:9999px;
+  --shadow-card:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-card-hover:0 2px 4px rgba(15,23,42,0.06),0 8px 24px rgba(15,23,42,0.08),0 0 0 1px rgba(59,130,246,0.08);
+  --ease-out:cubic-bezier(0.4,0,0.2,1);--ease-elastic:cubic-bezier(0.34,1.56,0.64,1);
+  --ease-in-out:cubic-bezier(0.2,0,0,1);--duration-fast:150ms;--duration-normal:250ms;--duration-slow:350ms;
+  --topbar-height:56px;--sidebar-width:240px;--sidebar-collapsed:64px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:var(--font-sans);background:var(--color-neutral-50);
+  color:var(--color-neutral-800);line-height:1.5;-webkit-font-smoothing:antialiased;
+  transition:background-color var(--duration-normal),color var(--duration-normal);
+}
+a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;}
+
+/* ==========TOPBAR ==========*/
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-height);
+  background:rgba(255,255,255,.85);backdrop-filter:blur(16px) saturate(180%);
+  -webkit-backdrop-filter:blur(16px) saturate(180%);
+  border-bottom:1px solid var(--color-neutral-200);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--space-5);z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:var(--space-4);min-width:0;}
+.hamburger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-600);}
+.hamburger:hover{background:var(--color-neutral-100);}
+.topbar-logo{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body);font-weight:700;color:var(--color-neutral-900);white-space:nowrap;}
+.topbar-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#FFF;flex-shrink:0;}
+.topbar-logo .logo-icon svg{width:16px;height:16px;}
+.breadcrumb{display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-caption);color:var(--color-neutral-400);white-space:nowrap;}
+.breadcrumb .current{color:var(--color-neutral-600);font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:var(--space-1);}
+.topbar-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-500);position:relative;transition:all var(--duration-fast);}
+.topbar-btn:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.topbar-btn svg{width:20px;height:20px;}
+.notification-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.user-menu{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);cursor:pointer;border:none;background:none;color:var(--color-neutral-800);font-family:var(--font-sans);font-size:var(--text-body-s);}
+.user-menu:hover{background:var(--color-neutral-100);}
+.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#FFF;font-size:13px;font-weight:600;flex-shrink:0;}
+.user-name{font-weight:500;white-space:nowrap;}
+
+/* ==========SIDEBAR ==========*/
+.sidebar{
+  position:fixed;top:var(--topbar-height);left:0;bottom:0;width:var(--sidebar-width);
+  background:#FFFFFF;border-right:1px solid var(--color-neutral-200);
+  display:flex;flex-direction:column;z-index:90;
+  transition:width var(--duration-slow) var(--ease-in-out),background-color var(--duration-normal);
+  overflow:hidden;
+}
+.sidebar.collapsed{width:var(--sidebar-collapsed);}
+.sidebar-nav{flex:1;padding:var(--space-3);display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;}
+.nav-item{
+  display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);
+  border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;
+  color:var(--color-neutral-600);transition:all var(--duration-fast);
+  white-space:nowrap;cursor:pointer;width:100%;text-align:left;font-family:var(--font-sans);border:none;background:none;
+}
+.nav-item svg{width:20px;height:20px;flex-shrink:0;}
+.nav-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.nav-item.active{background:var(--color-primary-50);color:var(--color-primary-600);box-shadow:inset 3px 0 0 var(--color-primary-500);}
+.nav-item .badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.nav-divider{height:1px;background:var(--color-neutral-200);margin:var(--space-2) var(--space-3);}
+.sidebar-footer{padding:var(--space-3);border-top:1px solid var(--color-neutral-200);}
+.collapse-btn{display:flex;align-items:center;gap:var(--space-3);width:100%;padding:10px var(--space-3);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-500);cursor:pointer;white-space:nowrap;border:none;background:none;}
+.collapse-btn:hover{background:var(--color-neutral-100);}
+.collapse-btn svg{width:20px;height:20px;flex-shrink:0;}
+
+/* ==========MAIN CONTENT ==========*/
+.main-content{
+  margin-left:var(--sidebar-width);margin-top:var(--topbar-height);
+  padding:var(--space-6);min-height:calc(100vh - var(--topbar-height));
+  transition:margin-left var(--duration-slow) var(--ease-in-out);
+}
+.sidebar.collapsed ~ .main-content{margin-left:var(--sidebar-collapsed);}
+
+/* ==========PAGE HEADER ==========*/
+.page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:var(--space-5);flex-wrap:wrap;gap:var(--space-3);
+}
+.page-header h1{font-size:var(--text-h2);font-weight:700;color:var(--color-neutral-900);}
+.page-header .actions{display:flex;gap:var(--space-2);align-items:center;}
+.btn-action{
+  padding:8px 18px;border-radius:var(--radius-sm);font-size:var(--text-body-s);font-weight:500;
+  background:#FFFFFF;color:var(--color-neutral-600);border:1px solid var(--color-neutral-200);
+  transition:all var(--duration-fast);display:flex;align-items:center;gap:var(--space-1);
+}
+.btn-action:hover{background:var(--color-neutral-50);border-color:var(--color-neutral-300);color:var(--color-neutral-800);}
+.btn-action svg{width:16px;height:16px;}
+
+/* ==========CATEGORY TABS ==========*/
+.category-tabs{
+  display:flex;gap:var(--space-1);margin-bottom:var(--space-5);
+  background:var(--color-neutral-100);border-radius:var(--radius-md);padding:4px;
+  overflow-x:auto;flex-wrap:nowrap;
+}
+.category-tab{
+  padding:8px 18px;border-radius:var(--radius-sm);font-size:var(--text-body-s);font-weight:500;
+  color:var(--color-neutral-500);white-space:nowrap;border:none;background:none;
+  transition:all var(--duration-fast);font-family:var(--font-sans);position:relative;
+}
+.category-tab:hover{color:var(--color-neutral-700);}
+.category-tab.active{background:#FFFFFF;color:var(--color-primary-600);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+.category-tab .tab-count{font-size:11px;font-weight:600;margin-left:4px;opacity:.7;}
+
+/* ==========SEARCH BAR ==========*/
+.notif-search{
+  position:relative;margin-bottom:var(--space-5);
+}
+.notif-search input{
+  width:100%;height:42px;padding:0 var(--space-4) 0 40px;
+  font-family:var(--font-sans);font-size:var(--text-body-s);
+  color:var(--color-neutral-800);background:#FFFFFF;
+  border:1.5px solid var(--color-neutral-200);border-radius:var(--radius-md);
+  outline:none;transition:all var(--duration-fast);
+}
+.notif-search input:focus{border-color:var(--color-primary-500);box-shadow:0 0 0 3px rgba(59,130,246,0.1);}
+.notif-search .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--color-neutral-400);pointer-events:none;}
+
+/* ==========NOTIFICATION LIST ==========*/
+.notif-list{display:flex;flex-direction:column;gap:var(--space-1);}
+.notif-item{
+  background:#FFFFFF;border:1px solid var(--color-neutral-200);
+  border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);
+  box-shadow:var(--shadow-card);cursor:pointer;transition:all var(--duration-normal);
+  position:relative;overflow:hidden;
+}
+.notif-item:hover{box-shadow:var(--shadow-card-hover);border-color:var(--color-primary-200);transform:translateY(-1px);}
+.notif-item.unread{background:linear-gradient(135deg,var(--color-primary-50),#FFFFFF);border-left:4px solid var(--color-primary-500);}
+.notif-item.unread::before{content:'';position:absolute;top:var(--space-4);right:var(--space-4);width:8px;height:8px;background:var(--color-primary-500);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(59,130,246,.4);}50%{opacity:.6;box-shadow:0 0 0 8px rgba(59,130,246,0);}}
+.notif-item .notif-top{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);flex-wrap:wrap;}
+.notif-tag{
+  padding:3px 10px;border-radius:var(--radius-full);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+}
+.notif-tag--jiaowu{background:var(--color-primary-100);color:var(--color-primary-700);}
+.notif-tag--kaoshi{background:var(--color-error-100);color:var(--color-error-500);}
+.notif-tag--xuanke{background:var(--color-warning-100);color:var(--color-accent-600);}
+.notif-tag--huodong{background:var(--color-success-100);color:var(--color-success-500);}
+.notif-tag--jiaofei{background:var(--color-neutral-100);color:var(--color-neutral-600);}
+.notif-time{font-size:var(--text-caption);color:var(--color-neutral-400);}
+.notif-item .notif-title{font-size:var(--text-subtitle);font-weight:600;color:var(--color-neutral-800);margin-bottom:var(--space-1);line-height:1.4;}
+.notif-item .notif-preview{font-size:var(--text-body-s);color:var(--color-neutral-500);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;transition:all var(--duration-normal);}
+.notif-item.expanded .notif-preview{-webkit-line-clamp:unset;line-clamp:unset;display:block;}
+.notif-item .notif-expand{font-size:var(--text-caption);color:var(--color-primary-500);font-weight:500;margin-top:var(--space-2);display:inline-block;}
+.notif-item .notif-footer{display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-neutral-100);font-size:var(--text-caption);color:var(--color-neutral-400);}
+.notif-item .notif-footer .publisher{display:flex;align-items:center;gap:var(--space-1);}
+.notif-item .notif-footer .publisher svg{width:14px;height:14px;}
+
+/* Pinned item */
+.notif-item.pinned{border-left:4px solid var(--color-accent-500);background:linear-gradient(135deg,var(--color-accent-50),#FFFFFF);}
+.pin-indicator{
+  font-size:11px;font-weight:600;color:var(--color-accent-600);
+  margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-1);
+}
+.pin-btn{
+  display:inline-flex;align-items:center;gap:3px;padding:3px 10px;
+  border-radius:var(--radius-full);font-size:11px;font-weight:500;
+  color:var(--color-accent-600);background:var(--color-accent-50);
+  border:1px solid var(--color-accent-200);cursor:pointer;
+  transition:all var(--duration-fast);font-family:var(--font-sans);
+}
+.pin-btn:hover{background:var(--color-accent-100);border-color:var(--color-accent-300);color:var(--color-accent-700);}
+
+/* Dark mode overrides */
+body.dark .notif-item.pinned{background:linear-gradient(135deg,rgba(245,158,11,0.08),#1E293B);}
+body.dark .pin-btn{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.2);color:var(--color-accent-400);}
+body.dark .pin-btn:hover{background:rgba(245,158,11,0.2);}
+
+/* ==========EMPTY STATE ==========*/
+.empty-state{
+  text-align:center;padding:var(--space-16) var(--space-5);color:var(--color-neutral-400);
+}
+.empty-state svg{width:64px;height:64px;margin-bottom:var(--space-4);opacity:.4;}
+.empty-state h3{font-size:var(--text-h3);font-weight:600;color:var(--color-neutral-500);margin-bottom:var(--space-1);}
+.empty-state p{font-size:var(--text-body-s);}
+
+/* ==========SIDEBAR OVERLAY ==========*/
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:85;opacity:0;transition:opacity var(--duration-normal);}
+.sidebar-overlay.show{display:block;opacity:1;}
+
+/* ==========DARK MODE ==========*/
+body.dark{
+  --color-neutral-50:#0F172A;--color-neutral-100:#1E293B;--color-neutral-200:#334155;
+  --color-neutral-300:#475569;--color-neutral-400:#64748B;--color-neutral-500:#94A3B8;
+  --color-neutral-600:#CBD5E1;--color-neutral-700:#E2E8F0;--color-neutral-800:#F1F5F9;--color-neutral-900:#F8FAFC;
+  --color-primary-50:rgba(59,130,246,0.15);
+}
+body.dark .topbar{background:rgba(15,23,42,.85);}
+body.dark .sidebar,body.dark .notif-item,.body.dark .notif-search input{background:#1E293B;}
+body.dark .notif-item.unread{background:linear-gradient(135deg,rgba(59,130,246,0.1),#1E293B);}
+body.dark .category-tab.active{background:#334155;color:#93C5FD;}
+body.dark .btn-action{background:#1E293B;}
+body.dark .category-tabs{background:rgba(255,255,255,.05);}
+
+/* ==========RESPONSIVE ==========*/
+@media(max-width:1024px){
+  .sidebar{width:var(--sidebar-collapsed);}
+  .sidebar .nav-item span,.sidebar .nav-item .badge,.sidebar .nav-divider,.sidebar .collapse-btn span{display:none;}
+  .sidebar .nav-item{justify-content:center;padding:10px;}
+  .sidebar:not(.mobile-open) .collapse-btn{display:none;}
+  .main-content{margin-left:var(--sidebar-collapsed) !important;}
+  .hamburger{display:flex;}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:var(--sidebar-width);z-index:95;}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .sidebar.mobile-open .nav-item{justify-content:flex-start;padding:10px var(--space-3);}
+  .sidebar.mobile-open .nav-item span,.sidebar.mobile-open .nav-item .badge,
+  .sidebar.mobile-open .nav-divider,.sidebar.mobile-open .collapse-btn span{display:inline;}
+  .main-content{margin-left:0 !important;padding:var(--space-3);}
+  .user-name{display:none;}
+  .breadcrumb{display:none;}
+  .category-tabs{gap:0;overflow-x:auto;}
+  .category-tab{padding:6px 12px;font-size:var(--text-caption);}
+  .notif-item{padding:var(--space-3) var(--space-4);}
+}
+
+
+.user-menu-wrap{position:relative;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:210px;background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);box-shadow:0 10px 40px rgba(15,23,42,0.14);padding:var(--space-2);z-index:200;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s var(--ease-out);}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);cursor:pointer;transition:all var(--duration-fast);border:none;background:none;width:100%;text-align:left;font-family:var(--font-sans);}
+.dropdown-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.dropdown-item svg{width:18px;height:18px;color:var(--color-neutral-400);flex-shrink:0;}
+.dropdown-item.danger{color:var(--color-error-500);}.dropdown-item.danger:hover{background:var(--color-error-100);}
+.dropdown-divider{height:1px;background:var(--color-neutral-100);margin:var(--space-1) 0;}
+body.dark .user-dropdown{background:#1E293B;border-color:#334155;}
+body.dark .dropdown-item:hover{background:rgba(255,255,255,.06);}
+body.dark .dropdown-divider{background:#334155;}
+body.dark .dropdown-item.danger:hover{background:rgba(239,68,68,0.15);}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<!-- ======顶部导航栏 ======-->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="topbar-logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg></div>教务系统</a>
+    <nav class="breadcrumb"><a href="index.html">首页</a><span>/</span><span class="current">校园通知</span></nav>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="darkModeToggle" title="暗黑模式"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" id="darkIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <button class="topbar-btn" style="position:relative;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notification-count" id="topNotifCount">3</span></button>
+    <div class="user-menu-wrap"><button class="user-menu" id="userMenuBtn"><div class="user-avatar">李</div><span class="user-name">李小宇</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="personal.html" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人信息</a>
+        <a href="#" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a href="login.html" class="dropdown-item danger"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<!-- ======侧边栏导航 ======-->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>首页仪表盘</span></a>
+    <a href="schedule.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>课表</span></a>
+    <a href="course-selection.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>选课中心</span></a>
+    <a href="grades.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>成绩查询</span></a>
+    <button class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>校园通知</span><span class="badge" id="sidebarBadge">3</span></button>
+    <a href="exams.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span>考试安排</span></a>
+    <div class="nav-divider"></div>
+    <a href="training.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg><span>培养方案</span></a>
+    <a href="payment.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>缴费查询</span></a>
+    <a href="resources.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>教学资源</span></a>
+    <a href="evaluation.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>教学评价</span></a>
+    <a href="settings.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+  </nav>
+  <div class="sidebar-footer"><button class="collapse-btn" id="collapseBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>折叠菜单</span></button></div>
+</aside>
+<!-- 移动端侧边栏遮罩 -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- MAIN CONTENT -->
+<!-- ======主内容区域 ======-->
+<div class="main-content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>🔔 校园通知</h1>
+    <div class="actions">
+      <button class="btn-action" id="btnMarkAllRead">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        全部已读
+      </button>
+    </div>
+  </div>
+
+  <!-- Category Tabs -->
+  <div class="category-tabs" id="categoryTabs">
+    <button class="category-tab active" data-cat="all">全部<span class="tab-count" id="countAll">12</span></button>
+    <button class="category-tab" data-cat="jiaowu">📋 教务<span class="tab-count" id="countJiaowu">3</span></button>
+    <button class="category-tab" data-cat="kaoshi">📝 考试<span class="tab-count" id="countKaoshi">3</span></button>
+    <button class="category-tab" data-cat="xuanke">📖 选课<span class="tab-count" id="countXuanke">2</span></button>
+    <button class="category-tab" data-cat="huodong">🎉 活动<span class="tab-count" id="countHuodong">2</span></button>
+    <button class="category-tab" data-cat="jiaofei">💰 缴费<span class="tab-count" id="countJiaofei">2</span></button>
+  </div>
+
+  <!-- Search -->
+  <div class="notif-search">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="notifSearchInput" placeholder="搜索通知标题或内容…">
+  </div>
+
+  <!-- Notification List -->
+  <div class="notif-list" id="notifList"></div>
+
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <h3>暂无匹配通知</h3>
+    <p>尝试切换分类或调整搜索关键词</p>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   NOTIFICATION DATA
+   ================================================================*/
+// 12 notifications with category, offsetH (hours ago), publisher, read state
+const NOTIFICATIONS = [
+  { id:1, cat:'jiaowu', title:'关于端午节放假及调课安排的通知', preview:'根据国家法定节假日安排，2026年端午节放假时间为6月19日（周五）至6月21日（周日），共3天。6月19日（周五）的课程调整至6月17日（周三）补上。请各学院提前做好教学安排，确保教学秩序正常运行。', offsetH:2, publisher:'教务处教学运行科', read:false },
+  { id:2, cat:'kaoshi', title:'2025-2026学年第二学期期末考试安排通知', preview:'本学期期末考试将于6月22日（周一）至7月3日（周五）进行。具体考试时间及地点安排已发布，请同学们登录系统查看个人考试安排，提前做好复习准备。重修及补考安排另行通知。', offsetH:5, publisher:'教务处考务科', read:false },
+  { id:3, cat:'pingjiao', title:'期末课程评教已开放，请及时完成', preview:'本学期学生评教工作已正式启动。评教时间为6月10日至6月24日。请同学们在规定时间内登录教务系统完成所有课程的评教工作。未完成评教将无法查看本学期成绩及进行下学期选课。', offsetH:26, publisher:'教学质量管理办公室', read:false },
+  { id:4, cat:'xuanke', title:'2026年秋季学期选课结果已公布', preview:'2026-2027学年第一学期（秋季学期）选课初选结果已于近日公布。请同学们及时登录系统查看选课结果。未被选上的课程可在补选阶段重新选择。补选采用先到先得原则。', offsetH:72, publisher:'教务处教务管理科', read:true },
+  { id:5, cat:'huodong', title:'关于举办第15届校园程序设计大赛的通知', preview:'为培养同学们的创新能力和实践能力，计算机学院与教务处联合举办第15届校园程序设计大赛。报名已开始。比赛形式：团队赛（3人一组）。奖品丰厚，欢迎踊跃报名！', offsetH:96, publisher:'计算机科学与技术学院', read:true },
+  { id:6, cat:'jiaofei', title:'2026-2027学年学费缴纳通知', preview:'2026-2027学年学费缴纳工作现已开始。请在8月15日前通过教务系统或学校财务平台完成缴费。学费标准详见各专业培养方案。家庭经济困难学生可于6月30日前提交助学贷款或缓交申请。', offsetH:120, publisher:'财务处', read:true },
+  { id:7, cat:'jiaowu', title:'关于2026届毕业生离校手续办理的通知', preview:'2026届毕业生离校手续将于6月25日至7月5日集中办理。请毕业生提前完成：①归还图书馆借阅图书 ②结清宿舍水电费用 ③完成毕业论文最终版提交 ④填写就业去向信息。', offsetH:144, publisher:'学生工作处', read:true },
+  { id:8, cat:'kaoshi', title:'全国大学英语四六级考试(CET)考前须知', preview:'2026年上半年CET考试将于6月15日进行。请考生携带准考证、身份证、学生证入场。听力使用校园广播FM 86.5MHz，请提前调试耳机。', offsetH:168, publisher:'教务处考务科', read:true },
+  { id:9, cat:'huodong', title:'"AI与未来教育"学术讲座通知', preview:'教务处特邀清华大学计算机系教授作题为"AI与未来教育：大语言模型如何重塑高等教育"的学术讲座。欢迎全校师生参加。', offsetH:180, publisher:'科研处', read:true },
+  { id:10, cat:'jiaowu', title:'关于2025级本科生转专业工作的通知', preview:'2025级本科生转专业申请已正式启动。申请条件：第一学年GPA≥3.0且无不及格记录。各专业接收名额及考核方案已公布在教务处网站。请符合条件的同学按时提交申请。', offsetH:190, publisher:'教务处学籍管理科', read:true },
+  { id:11, cat:'xuanke', title:'下学期通识选修课课程目录已发布', preview:'2026-2027学年第一学期通识选修课目录已上线。新增课程包括：《Python数据科学入门》、《中国传统文化概论》、《创业基础与实践》、《环境与可持续发展》。欢迎同学们查看。', offsetH:336, publisher:'教务处教务管理科', read:true },
+  { id:12, cat:'jiaofei', title:'关于毕业生教材费结算退费的通知', preview:'2026届毕业生教材费结算工作已启动。请相关同学登录财务系统确认银行卡信息。退费将于6月30日前打入登记银行卡账户。如有疑问请联系财务处综合科。', offsetH:350, publisher:'财务处', read:true },
+];
+
+// Compute relative time from offset hours
+// ====RELATIVE TIME: converts offset hours to human-readable Chinese time strings ====
+  function getRelativeTime(offsetH) {
+  if (offsetH < 1) return Math.round(offsetH * 60) + '分钟前';
+  if (offsetH < 24) return offsetH + '小时前';
+  if (offsetH < 48) return '昨天';
+  if (offsetH < 168) return Math.floor(offsetH / 24) + '天前';
+  if (offsetH < 336) return Math.floor(offsetH / 168) + '周前';
+  if (offsetH < 720) return Math.floor(offsetH / 168) + '周前';
+  return Math.floor(offsetH / 720) + '个月前';
+}
+
+let activeCategory = 'all';
+let searchQuery = '';
+let expandedIds = new Set();
+
+// ================================================================
+// RENDER
+// ================================================================
+// ====RENDER NOTIFS: filters by category + search, sorts by pinned status, renders cards with read/pin states ====
+  function renderNotifications() {
+  let filtered = NOTIFICATIONS.filter(n => {
+    if (activeCategory !== 'all' && n.cat !== activeCategory) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!n.title.toLowerCase().includes(q) && !n.preview.toLowerCase().includes(q) && !n.publisher.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  // Update category counts
+  const counts = {};
+  NOTIFICATIONS.forEach(n => { counts[n.cat] = (counts[n.cat] || 0) + 1; });
+  counts.all = NOTIFICATIONS.length;
+  ['all','jiaowu','kaoshi','xuanke','huodong','jiaofei','pingjiao'].forEach(cat => {
+    const el = document.getElementById('count' + cat.charAt(0).toUpperCase() + cat.slice(1));
+    if (el && counts[cat] !== undefined) el.textContent = counts[cat];
+  });
+
+  // Update unread badge + persist to localStorage
+  const unread = NOTIFICATIONS.filter(n => !n.read).length;
+  localStorage.setItem('unreadCount', unread);
+  // Also persist which specific notifications are read
+  var readIds = NOTIFICATIONS.filter(function(n) { return n.read; }).map(function(n) { return n.id; });
+  localStorage.setItem('readNotifIds', JSON.stringify(readIds));
+
+  var sideBadge = document.getElementById('sidebarBadge');
+  var topBadge = document.getElementById('topNotifCount');
+  [sideBadge, topBadge].forEach(function(el) {
+    if (!el) return;
+    el.textContent = unread;
+    el.style.display = unread > 0 ? '' : 'none';
+  });
+
+  // Render list
+  const list = document.getElementById('notifList');
+  const empty = document.getElementById('emptyState');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  var sorted = getSortedNotifications(filtered);
+
+  list.innerHTML = sorted.map(n => {
+    const isExpanded = expandedIds.has(n.id);
+    const isPinned = pinnedIds.has(n.id);
+    return `
+    <div class="notif-item${n.read ? '' : ' unread'}${isPinned ? ' pinned' : ''}" data-id="${n.id}">
+      ${isPinned ? '<div class="pin-indicator">📌 稍后再读</div>' : ''}
+      <div class="notif-top">
+        <span class="notif-tag notif-tag--${n.cat}">${getTagLabel(n.cat)}</span>
+        <span class="notif-time">${getRelativeTime(n.offsetH)}</span>
+      </div>
+      <div class="notif-title">${highlightMatch(n.title)}</div>
+      <div class="notif-preview" style="${isExpanded ? '-webkit-line-clamp:unset;display:block;' : ''}">${highlightMatch(n.preview)}</div>
+      <span class="notif-expand">${isExpanded ? '收起 ▲' : '展开阅读全文 ▼'}</span>
+      <div class="notif-footer">
+        <span class="publisher">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          ${n.publisher}
+        </span>
+        <span style="display:flex;align-items:center;gap:var(--space-3);">
+          ${!n.read ? '<span style="color:var(--color-primary-500);font-weight:500;">● 未读</span>' : '<span>已读</span>'}
+          <button class="pin-btn" data-pin="${n.id}" title="${isPinned ? '取消稍后再读' : '稍后再读'}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${isPinned ? '取消' : '稍后再读'}
+          </button>
+        </span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Attach pin button handlers (before item click handler)
+  list.querySelectorAll('.pin-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      togglePin(parseInt(this.dataset.pin));
+    });
+  });
+
+  // Attach click handlers for expand / mark read
+  list.querySelectorAll('.notif-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      const id = parseInt(this.dataset.id);
+      const notif = NOTIFICATIONS.find(n => n.id === id);
+      if (notif && !notif.read) {
+        notif.read = true;
+        // When reading a pinned item, also unpin it so it returns to original position
+        if (pinnedIds.has(id)) {
+          pinnedIds.delete(id);
+          savePinned();
+        }
+      }
+      if (expandedIds.has(id)) {
+        expandedIds.delete(id);
+      } else {
+        expandedIds.add(id);
+      }
+      renderNotifications();
+    });
+  });
+}
+
+function getTagLabel(cat) {
+  const labels = { jiaowu:'教务', kaoshi:'考试', xuanke:'选课', huodong:'活动', jiaofei:'缴费', pingjiao:'评教' };
+  return labels[cat] || cat;
+}
+
+function highlightMatch(text) {
+  if (!searchQuery) return text;
+  const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<mark style="background:#FDE68A;color:#1E293B;padding:0 2px;border-radius:2px;">$1</mark>');
+}
+
+// ================================================================
+// EVENT HANDLERS
+// ================================================================
+document.getElementById('categoryTabs').addEventListener('click', function(e) {
+  const tab = e.target.closest('.category-tab');
+  if (!tab) return;
+  document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  activeCategory = tab.dataset.cat;
+  expandedIds.clear();
+  renderNotifications();
+});
+
+document.getElementById('notifSearchInput').addEventListener('input', function() {
+  searchQuery = this.value;
+  expandedIds.clear();
+  renderNotifications();
+});
+
+document.getElementById('btnMarkAllRead').addEventListener('click', function() {
+  NOTIFICATIONS.forEach(n => { n.read = true; });
+  pinnedIds.clear();
+  savePinned();
+  expandedIds.clear();
+  renderNotifications();
+});
+
+// ================================================================
+// PIN / REMIND LATER LOGIC
+// ================================================================
+var pinnedIds = new Set();
+
+// ====LOAD PINNED: restores pinned notification IDs from localStorage ====
+  function loadPinned() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('pinnedNotifIds') || '[]');
+    saved.forEach(function(id) { pinnedIds.add(id); });
+  } catch(e) { pinnedIds = new Set(); }
+}
+
+// ====SAVE PINNED: persists pinned notification IDs to localStorage ====
+  function savePinned() {
+  localStorage.setItem('pinnedNotifIds', JSON.stringify(Array.from(pinnedIds)));
+}
+
+// ====TOGGLE PIN: pins/unpins a notification (稍后再读), marks unread if already read ====
+  function togglePin(notifId) {
+  if (pinnedIds.has(notifId)) {
+    pinnedIds.delete(notifId);
+  } else {
+    pinnedIds.add(notifId);
+    // 稍后再读意味着还需要关注 — 如果已读就恢复为未读，Badge +1
+    var notif = NOTIFICATIONS.find(function(n) { return n.id === notifId; });
+    if (notif && notif.read) {
+      notif.read = false;
+    }
+  }
+  savePinned();
+  renderNotifications();
+}
+
+// Sort: pinned items first, then by original id order
+// ====SORT: pinned items first, then by original ID order ====
+  function getSortedNotifications(filtered) {
+  return filtered.slice().sort(function(a, b) {
+    var aPin = pinnedIds.has(a.id) ? 0 : 1;
+    var bPin = pinnedIds.has(b.id) ? 0 : 1;
+    if (aPin !== bPin) return aPin - bPin;
+    return a.id - b.id;
+  });
+}
+
+// ================================================================
+// SIDEBAR & DARK MODE
+// ================================================================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('collapseBtn').addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+
+const hamburger = document.getElementById('hamburgerBtn');
+const overlay = document.getElementById('sidebarOverlay');
+function closeSidebar() { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); }
+hamburger.addEventListener('click', () => {
+  sidebar.classList.contains('mobile-open') ? closeSidebar() : (sidebar.classList.add('mobile-open'), overlay.classList.add('show'));
+});
+overlay.addEventListener('click', closeSidebar);
+
+const darkToggle = document.getElementById('darkModeToggle');
+const darkIcon = document.getElementById('darkIcon');
+function setDarkMode(on) {
+  document.body.classList.toggle('dark', on);
+  darkIcon.innerHTML = on ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  localStorage.setItem('theme', on ? 'dark' : 'light');
+}
+darkToggle.addEventListener('click', () => setDarkMode(!document.body.classList.contains('dark')));
+if (localStorage.getItem('theme') === 'dark') setDarkMode(true);
+
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+  item.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); });
+});
+
+// INIT
+// Restore pinned + read states from localStorage
+loadPinned();
+// Restore per-notification read state
+var readIds = [];
+try { readIds = JSON.parse(localStorage.getItem('readNotifIds') || '[]'); } catch(e) {}
+NOTIFICATIONS.forEach(function(n) {
+  n.read = readIds.indexOf(n.id) !== -1;
+});
+renderNotifications();
+var um=document.getElementById("userMenuBtn"),ud=document.getElementById("userDropdown");if(um&&ud){um.addEventListener("click",function(e){e.stopPropagation();ud.classList.toggle("show");});document.addEventListener("click",function(){ud.classList.remove("show");});}var savedName=localStorage.getItem("userName");if(savedName){var un=document.querySelector(".user-name");if(un)un.textContent=savedName;var av=document.querySelector(".user-avatar");if(av)av.textContent=savedName.charAt(0);}</script>
+<script src="_shared.js"></script>
+</body>
+</html>

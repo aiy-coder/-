@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="_shell.css">
+  <title>个人信息 - 高校教务系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --color-primary-50:#EFF6FF;--color-primary-100:#DBEAFE;--color-primary-200:#BFDBFE;
+  --color-primary-500:#3B82F6;--color-primary-600:#2563EB;--color-primary-700:#1D4ED8;
+  --color-accent-500:#F59E0B;
+  --color-neutral-50:#F8FAFC;--color-neutral-100:#F1F5F9;--color-neutral-200:#E2E8F0;
+  --color-neutral-300:#CBD5E1;--color-neutral-400:#94A3B8;--color-neutral-500:#64748B;
+  --color-neutral-600:#475569;--color-neutral-700:#334155;--color-neutral-800:#1E293B;--color-neutral-900:#0F172A;
+  --color-success-500:#10B981;--color-warning-500:#F59E0B;--color-error-500:#EF4444;--color-error-100:#FEE2E2;
+  --font-sans:"Inter","PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+  --text-h2:1.25rem;--text-h3:1.125rem;--text-subtitle:1rem;--text-body:0.9375rem;--text-body-s:0.875rem;--text-caption:0.75rem;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-full:9999px;
+  --shadow-card:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-card-hover:0 2px 4px rgba(15,23,42,0.06),0 8px 24px rgba(15,23,42,0.08),0 0 0 1px rgba(59,130,246,0.08);
+  --ease-out:cubic-bezier(0.4,0,0.2,1);--duration-fast:150ms;--duration-normal:250ms;--duration-slow:350ms;
+  --topbar-height:56px;--sidebar-width:240px;--sidebar-collapsed:64px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);background:var(--color-neutral-50);color:var(--color-neutral-800);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background-color var(--duration-normal),color var(--duration-normal);}
+a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;}
+
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:rgba(255,255,255,.85);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border-bottom:1px solid var(--color-neutral-200);display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-5);z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:var(--space-4);min-width:0;}
+.hamburger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-600);}.hamburger:hover{background:var(--color-neutral-100);}
+.topbar-logo{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body);font-weight:700;color:var(--color-neutral-900);white-space:nowrap;}
+.topbar-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#FFF;flex-shrink:0;}
+.topbar-logo .logo-icon svg{width:16px;height:16px;}
+.breadcrumb{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-caption);color:var(--color-neutral-400);}.breadcrumb .current{color:var(--color-neutral-600);font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:var(--space-1);}
+.topbar-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-500);position:relative;}.topbar-btn:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}.topbar-btn svg{width:20px;height:20px;}
+.notification-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+
+.sidebar{position:fixed;top:var(--topbar-height);left:0;bottom:0;width:var(--sidebar-width);background:#FFFFFF;border-right:1px solid var(--color-neutral-200);display:flex;flex-direction:column;z-index:90;transition:width var(--duration-slow) var(--ease-out),background-color var(--duration-normal);overflow:hidden;}.sidebar.collapsed{width:var(--sidebar-collapsed);}
+.sidebar-nav{flex:1;padding:var(--space-3);display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);transition:all var(--duration-fast);white-space:nowrap;cursor:pointer;width:100%;text-align:left;font-family:var(--font-sans);border:none;background:none;}.nav-item svg{width:20px;height:20px;flex-shrink:0;}.nav-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}.nav-item .badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.nav-divider{height:1px;background:var(--color-neutral-200);margin:var(--space-2) var(--space-3);}
+.sidebar-footer{padding:var(--space-3);border-top:1px solid var(--color-neutral-200);}
+.collapse-btn{display:flex;align-items:center;gap:var(--space-3);width:100%;padding:10px var(--space-3);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-500);cursor:pointer;white-space:nowrap;border:none;background:none;}.collapse-btn:hover{background:var(--color-neutral-100);}.collapse-btn svg{width:20px;height:20px;flex-shrink:0;}
+.main-content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:var(--space-6);min-height:calc(100vh - var(--topbar-height));transition:margin-left var(--duration-slow) var(--ease-out);}.sidebar.collapsed ~ .main-content{margin-left:var(--sidebar-collapsed);}
+
+.page-header{margin-bottom:var(--space-6);}
+.page-header h1{font-size:var(--text-h2);font-weight:700;color:var(--color-neutral-900);}
+.page-header .subtitle{font-size:var(--text-body-s);color:var(--color-neutral-500);}
+
+.profile-layout{display:flex;gap:var(--space-6);}
+.profile-main{flex:1;}
+
+.profile-top{background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-xl);padding:var(--space-8);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-5);}
+.profile-avatar-wrap{position:relative;}
+.profile-avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#FFF;box-shadow:0 8px 32px rgba(59,130,246,0.25);}
+.avatar-edit-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:#FFF;border:2px solid var(--color-neutral-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-neutral-500);transition:all var(--duration-fast);}
+.avatar-edit-btn:hover{background:var(--color-primary-50);border-color:var(--color-primary-300);color:var(--color-primary-600);}
+.avatar-edit-btn svg{width:14px;height:14px;}
+.profile-summary{}
+.profile-summary .pname{font-size:var(--text-h2);font-weight:700;color:var(--color-neutral-900);margin-bottom:var(--space-1);}
+.profile-summary .pid{font-size:var(--text-body-s);color:var(--color-neutral-500);margin-bottom:var(--space-2);}
+.profile-summary .tags{display:flex;gap:var(--space-2);flex-wrap:wrap;}
+.profile-tag{padding:3px 12px;border-radius:var(--radius-full);font-size:var(--text-caption);font-weight:500;background:var(--color-primary-50);color:var(--color-primary-600);}
+
+.profile-actions{margin-left:auto;display:flex;flex-direction:column;gap:var(--space-2);}
+.btn-edit{padding:10px 24px;border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:600;background:var(--color-primary-500);color:#FFF;border:none;cursor:pointer;transition:all var(--duration-fast);}
+.btn-edit:hover{background:var(--color-primary-600);box-shadow:0 4px 12px rgba(59,130,246,0.3);}
+.btn-edit.editing{background:var(--color-warning-500);}
+
+.info-card{background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);margin-bottom:var(--space-5);}
+.info-card-header{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-neutral-100);font-size:var(--text-body);font-weight:600;color:var(--color-neutral-800);display:flex;align-items:center;gap:var(--space-2);}
+.info-card-header svg{width:18px;height:18px;color:var(--color-primary-500);}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.info-field{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--color-neutral-50);border-right:1px solid var(--color-neutral-50);}
+.info-field:nth-child(even){border-right:none;}
+.info-field:nth-last-child(-n+2){border-bottom:none;}
+.info-field .f-label{font-size:var(--text-caption);color:var(--color-neutral-400);margin-bottom:var(--space-1);text-transform:uppercase;letter-spacing:.03em;}
+.info-field .f-value{font-size:var(--text-body-s);font-weight:600;color:var(--color-neutral-800);}
+.info-field input{width:100%;padding:6px 8px;font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:600;color:var(--color-neutral-800);border:1.5px solid var(--color-primary-300);border-radius:var(--radius-sm);outline:none;background:var(--color-primary-50);}
+.info-field input:focus{border-color:var(--color-primary-500);box-shadow:0 0 0 2px rgba(59,130,246,0.1);background:#FFF;}
+.info-field input:disabled{border-color:transparent;background:transparent;color:var(--color-neutral-800);padding:0;}
+
+.side-panel{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:var(--space-5);}
+.panel-card{background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-card);}.panel-card:hover{box-shadow:var(--shadow-card-hover);}.panel-card h3{font-size:var(--text-body);font-weight:600;color:var(--color-neutral-800);margin-bottom:var(--space-4);}
+.security-item{display:flex;justify-content:space-between;align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-neutral-50);font-size:var(--text-body-s);}
+.security-item:last-child{border-bottom:none;}
+.security-item .sec-label{color:var(--color-neutral-600);}
+.security-item .sec-status{font-size:var(--text-caption);}.sec-status.ok{color:var(--color-success-500);}.sec-status.warn{color:var(--color-warning-500);}
+.btn-sm{padding:6px 14px;border-radius:var(--radius-sm);font-size:var(--text-caption);font-weight:600;cursor:pointer;transition:all var(--duration-fast);border:1.5px solid var(--color-primary-300);background:#FFF;color:var(--color-primary-600);}
+.btn-sm:hover{background:var(--color-primary-50);}
+
+.user-menu-wrap{position:relative;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:210px;background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);box-shadow:0 10px 40px rgba(15,23,42,0.14);padding:var(--space-2);z-index:200;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s var(--ease-out);}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);cursor:pointer;transition:all var(--duration-fast);border:none;background:none;width:100%;text-align:left;font-family:var(--font-sans);}
+.dropdown-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}.dropdown-item svg{width:18px;height:18px;color:var(--color-neutral-400);flex-shrink:0;}
+.dropdown-item.danger{color:var(--color-error-500);}.dropdown-item.danger:hover{background:var(--color-error-100);}
+.dropdown-divider{height:1px;background:var(--color-neutral-100);margin:var(--space-1) 0;}
+body.dark .user-dropdown{background:#1E293B;border-color:var(--color-neutral-200);}
+body.dark .dropdown-item:hover{background:rgba(255,255,255,.06);}
+
+.user-menu{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);cursor:pointer;border:none;background:none;color:var(--color-neutral-800);font-family:var(--font-sans);font-size:var(--text-body-s);}.user-menu:hover{background:var(--color-neutral-100);}
+.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#FFF;font-size:13px;font-weight:600;flex-shrink:0;}.user-name{font-weight:500;white-space:nowrap;}
+
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:85;opacity:0;transition:opacity var(--duration-normal);}.sidebar-overlay.show{display:block;opacity:1;}
+body.dark{--color-neutral-50:#0F172A;--color-neutral-100:#1E293B;--color-neutral-200:#334155;--color-neutral-300:#475569;--color-neutral-400:#64748B;--color-neutral-500:#94A3B8;--color-neutral-600:#CBD5E1;--color-neutral-700:#E2E8F0;--color-neutral-800:#F1F5F9;--color-neutral-900:#F8FAFC;--color-primary-50:rgba(59,130,246,0.15);}
+body.dark .topbar{background:rgba(15,23,42,.85);}
+body.dark .sidebar,body.dark .profile-top,body.dark .info-card,body.dark .panel-card{background:#1E293B;}
+body.dark .info-field input:disabled{background:transparent;color:var(--color-neutral-800);}
+body.dark .info-field input{border-color:var(--color-primary-300);background:rgba(59,130,246,0.08);}
+body.dark .info-field input:focus{background:#1E293B;}
+
+@media(max-width:1100px){.side-panel{display:none;}}
+@media(max-width:1024px){
+  .sidebar{width:var(--sidebar-collapsed);}.sidebar .nav-item span,.sidebar .nav-item .badge,.sidebar .nav-divider,.sidebar .collapse-btn span{display:none;}.sidebar .nav-item{justify-content:center;padding:10px;}.sidebar:not(.mobile-open) .collapse-btn{display:none;}.main-content{margin-left:var(--sidebar-collapsed)!important;}.hamburger{display:flex;}
+  .profile-top{flex-direction:column;text-align:center;gap:var(--space-4);}.profile-actions{margin-left:0;}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:var(--sidebar-width);z-index:95;}.sidebar.mobile-open{transform:translateX(0);}.sidebar.mobile-open .nav-item{justify-content:flex-start;padding:10px var(--space-3);}.sidebar.mobile-open .nav-item span,.sidebar.mobile-open .nav-item .badge,.sidebar.mobile-open .nav-divider,.sidebar.mobile-open .collapse-btn span{display:inline;}.main-content{margin-left:0!important;padding:var(--space-3);}.user-name{display:none;}.breadcrumb{display:none;}
+  .profile-layout{flex-direction:column;}.info-grid{grid-template-columns:1fr;}.info-field{border-right:none;}.info-field:nth-last-child(-n+2){border-bottom:1px solid var(--color-neutral-50);}.info-field:last-child{border-bottom:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ====== 顶部导航栏 ====== -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="菜单"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <a href="index.html" class="topbar-logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg></div>教务系统</a>
+    <nav class="breadcrumb"><a href="index.html">首页</a><span>/</span><span class="current">个人信息</span></nav>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="darkModeToggle" title="暗黑模式"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" id="darkIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <a href="notifications.html" class="topbar-btn" style="position:relative;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notification-count" id="topNotifCount">3</span></a>
+    <div class="user-menu-wrap"><button class="user-menu" id="userMenuBtn"><div class="user-avatar">李</div><span class="user-name">李小宇</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="personal.html" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人信息</a>
+        <a href="#" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a href="login.html" class="dropdown-item danger"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ====== 侧边栏导航 ====== -->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>首页仪表盘</span></a>
+    <a href="schedule.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>课表</span></a>
+    <a href="course-selection.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>选课中心</span></a>
+    <a href="grades.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>成绩查询</span></a>
+    <a href="notifications.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>校园通知</span><span class="badge" id="sidebarBadge">3</span></a>
+    <a href="exams.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span>考试安排</span></a>
+    <div class="nav-divider"></div>
+    <a href="training.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg><span>培养方案</span></a>
+    <a href="payment.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>缴费查询</span></a>
+    <a href="resources.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>教学资源</span></a>
+    <a href="evaluation.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>教学评价</span></a>
+    <a href="settings.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+  </nav>
+  <div class="sidebar-footer"><button class="collapse-btn" id="collapseBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>折叠菜单</span></button></div>
+</aside>
+<!-- 移动端侧边栏遮罩 -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ====== 主内容区域 ====== -->
+<div class="main-content">
+  <div class="profile-main">
+    <div class="page-header"><h1>👤 个人信息</h1><p class="subtitle">管理你的个人资料与账户安全</p></div>
+
+    <!-- Profile top card -->
+    <!-- Profile header: avatar + name + student ID + edit button -->
+  <div class="profile-top">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar">李</div>
+        <div class="avatar-edit-btn" title="更换头像"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+      </div>
+      <div class="profile-summary">
+        <div class="pname" id="displayName">李小宇</div>
+        <div class="pid">学号 20241152019</div>
+        <div class="tags">
+          <span class="profile-tag">计算机科学与技术学院</span>
+          <span class="profile-tag">2024 级</span>
+          <span class="profile-tag">在读</span>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button class="btn-edit" id="editBtn">✏️ 编辑资料</button>
+        <span style="font-size:var(--text-caption);color:var(--color-neutral-400);">最后更新: <span id="lastUpdate">2026-03-01</span></span>
+      </div>
+    </div>
+
+    <!-- Info grid -->
+    <!-- Info sections: basic info, academic info, contact info -->
+  <div class="info-card">
+      <div class="info-card-header"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>基本信息</div>
+      <div class="info-grid">
+        <div class="info-field"><div class="f-label">姓名</div><div class="f-value" id="fname">李小宇</div></div>
+        <div class="info-field"><div class="f-label">学号</div><div class="f-value" style="color:var(--color-neutral-500);">20241152019</div></div>
+        <div class="info-field"><div class="f-label">性别</div><div class="f-value" id="fgender">男</div></div>
+        <div class="info-field"><div class="f-label">出生日期</div><div class="f-value" id="fbirth">2005-08-15</div></div>
+        <div class="info-field"><div class="f-label">民族</div><div class="f-value" id="fethnic">汉族</div></div>
+        <div class="info-field"><div class="f-label">身份证号</div><div class="f-value" style="color:var(--color-neutral-500);">320***********1234</div></div>
+      </div>
+    </div>
+
+    <!-- Info sections: basic info, academic info, contact info -->
+  <div class="info-card">
+      <div class="info-card-header"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg>学籍信息</div>
+      <div class="info-grid">
+        <div class="info-field"><div class="f-label">学院</div><div class="f-value" style="color:var(--color-neutral-500);">计算机科学与技术学院</div></div>
+        <div class="info-field"><div class="f-label">专业</div><div class="f-value" style="color:var(--color-neutral-500);">计算机科学与技术</div></div>
+        <div class="info-field"><div class="f-label">班级</div><div class="f-value">计科2401 班</div></div>
+        <div class="info-field"><div class="f-label">入学年份</div><div class="f-value" style="color:var(--color-neutral-500);">2024 年</div></div>
+      </div>
+    </div>
+
+    <!-- Info sections: basic info, academic info, contact info -->
+  <div class="info-card">
+      <div class="info-card-header"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>联系方式</div>
+      <div class="info-grid">
+        <div class="info-field"><div class="f-label">电子邮箱</div><div class="f-value" id="femail">lixiaoyu@uni.edu.cn</div></div>
+        <div class="info-field"><div class="f-label">手机号码</div><div class="f-value" id="fphone">138****6789</div></div>
+        <div class="info-field"><div class="f-label">宿舍地址</div><div class="f-value">学生公寓 12 号楼 305 室</div></div>
+        <div class="info-field"><div class="f-label">紧急联系人</div><div class="f-value" id="femergency">李建国（父）139****8901</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side panel -->
+  <div class="side-panel">
+    <div class="panel-card">
+      <h3>🔒 账户安全</h3>
+      <div class="security-item"><span class="sec-label">密码强度</span><span class="sec-status ok">●●●○○ 中等</span></div>
+      <div class="security-item"><span class="sec-label">绑定手机</span><span class="sec-status ok">✅ 已绑定</span></div>
+      <div class="security-item"><span class="sec-label">绑定邮箱</span><span class="sec-status ok">✅ 已绑定</span></div>
+      <div class="security-item"><span class="sec-label">最后登录</span><span class="sec-status" style="color:var(--color-neutral-500);">2026-06-12 14:30</span></div>
+      <div style="margin-top:var(--space-3);"><button class="btn-sm">修改密码</button></div>
+    </div>
+    <div class="panel-card">
+      <h3>📋 在校统计</h3>
+      <div style="font-size:var(--text-body-s);color:var(--color-neutral-600);line-height:2;">
+        <div>📖 已修课程: 28 门</div>
+        <div>📊 累计 GPA: 3.72</div>
+        <div>🏆 班级排名: 15/85</div>
+        <div>📅 已就读: 4 学期</div>
+        <div>🎓 预计毕业: 2028年6月</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Sidebar & dark mode
+var sidebar=document.getElementById('sidebar');
+document.getElementById('collapseBtn').addEventListener('click',function(){sidebar.classList.toggle('collapsed');});
+var hamburger=document.getElementById('hamburgerBtn'),overlay=document.getElementById('sidebarOverlay');
+function closeSidebar(){sidebar.classList.remove('mobile-open');overlay.classList.remove('show');}
+hamburger.addEventListener('click',function(){sidebar.classList.contains('mobile-open')?closeSidebar():(sidebar.classList.add('mobile-open'),overlay.classList.add('show'));});
+overlay.addEventListener('click',closeSidebar);
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('click',function(){if(window.innerWidth<=768)closeSidebar();});});
+var darkToggle=document.getElementById('darkModeToggle'),darkIcon=document.getElementById('darkIcon');
+function setDarkMode(on){document.body.classList.toggle('dark',on);darkIcon.innerHTML=on?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';localStorage.setItem('theme',on?'dark':'light');}
+darkToggle.addEventListener('click',function(){setDarkMode(!document.body.classList.contains('dark'));});if(localStorage.getItem('theme')==='dark')setDarkMode(true);
+(function(){var c=parseInt(localStorage.getItem('unreadCount')||'3');[document.getElementById('topNotifCount'),document.getElementById('sidebarBadge')].forEach(function(el){if(!el)return;el.textContent=c;el.style.display=c>0?'':'none';});})();
+// User dropdown
+var um=document.getElementById("userMenuBtn"),ud=document.getElementById("userDropdown");if(um&&ud){um.addEventListener("click",function(e){e.stopPropagation();ud.classList.toggle("show");});document.addEventListener("click",function(){ud.classList.remove("show");});}
+
+// ==== NAME RESTORE: reads userName from localStorage, updates all name displays on page load ====
+(function(){
+  var name = localStorage.getItem('userName');
+  if (!name) return;
+  var un = document.querySelector('.user-name'); if (un) un.textContent = name;
+  var av = document.querySelector('.user-avatar'); if (av) av.textContent = name.charAt(0);
+  var dn = document.getElementById('displayName'); if (dn) dn.textContent = name;
+  var fn = document.getElementById('fname'); if (fn) fn.textContent = name;
+  var pa = document.getElementById('profileAvatar'); if (pa) pa.textContent = name.charAt(0);
+})();
+
+// ==== EDIT MODE: toggles between display and input fields, syncs name to header + topbar + avatar + localStorage ====
+var editing = false;
+var editBtn = document.getElementById('editBtn');
+var editFields = ['fname','femail'];
+
+editBtn.addEventListener('click', function(){
+  if (editing) {
+    // SAVE — read values from inputs, write back
+    editFields.forEach(function(id){
+      var inp = document.querySelector('#input_' + id);
+      var cell = document.getElementById(id);
+      if (!inp || !cell) return;
+      cell.textContent = inp.value;
+    });
+    // Sync name to header, topbar, avatar, and localStorage
+    var newName = document.getElementById('fname').textContent;
+    document.getElementById('displayName').textContent = newName;
+    var topName = document.querySelector('.user-name');
+    if (topName) topName.textContent = newName;
+    var avatar = document.querySelector('.user-avatar');
+    if (avatar) avatar.textContent = newName.charAt(0);
+    var bigAv = document.getElementById('profileAvatar');
+    if (bigAv) bigAv.textContent = newName.charAt(0);
+    localStorage.setItem('userName', newName);
+    // Update last modified date
+    var now = new Date();
+    var lu = document.getElementById('lastUpdate');
+    if (lu) lu.textContent = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+
+    editing = false;
+    editBtn.textContent = '✅ 已保存';
+    editBtn.classList.remove('editing');
+    setTimeout(function(){ editBtn.textContent = '✏️ 编辑资料'; }, 1500);
+  } else {
+    // EDIT — replace text with inputs
+    editFields.forEach(function(id){
+      var cell = document.getElementById(id);
+      if (!cell) return;
+      var val = cell.textContent.trim();
+      cell.innerHTML = '<input type="text" value="' + val + '" id="input_' + id + '" style="width:100%;padding:6px 8px;font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:600;color:var(--color-neutral-800);border:1.5px solid var(--color-primary-300);border-radius:var(--radius-sm);outline:none;background:var(--color-primary-50);">';
+    });
+    editing = true;
+    editBtn.textContent = '💾 保存资料';
+    editBtn.classList.add('editing');
+    // Auto-focus first field
+    setTimeout(function(){ var first = document.getElementById('input_fname'); if (first) first.focus(); }, 100);
+  }
+});
+</script>
+<script src="_shared.js"></script>
+</body>
+</html>

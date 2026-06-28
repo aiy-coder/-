@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="_shell.css">
+  <title>教学评价 - 高校教务系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --color-primary-50:#EFF6FF;--color-primary-100:#DBEAFE;--color-primary-500:#3B82F6;--color-primary-600:#2563EB;
+  --color-accent-500:#F59E0B;--color-accent-100:#FEF3C7;
+  --color-neutral-50:#F8FAFC;--color-neutral-100:#F1F5F9;--color-neutral-200:#E2E8F0;
+  --color-neutral-300:#CBD5E1;--color-neutral-400:#94A3B8;--color-neutral-500:#64748B;
+  --color-neutral-600:#475569;--color-neutral-700:#334155;--color-neutral-800:#1E293B;--color-neutral-900:#0F172A;
+  --color-success-500:#10B981;--color-success-100:#D1FAE5;
+  --color-warning-500:#F59E0B;--color-warning-100:#FEF3C7;
+  --color-error-500:#EF4444;--color-error-100:#FEE2E2;
+  --font-sans:"Inter","PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+  --text-h2:1.25rem;--text-h3:1.125rem;--text-subtitle:1rem;--text-body:0.9375rem;--text-body-s:0.875rem;--text-caption:0.75rem;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-full:9999px;
+  --shadow-card:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-card-hover:0 2px 4px rgba(15,23,42,0.06),0 8px 24px rgba(15,23,42,0.08),0 0 0 1px rgba(59,130,246,0.08);
+  --ease-out:cubic-bezier(0.4,0,0.2,1);--duration-fast:150ms;--duration-normal:250ms;--duration-slow:350ms;
+  --topbar-height:56px;--sidebar-width:240px;--sidebar-collapsed:64px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);background:var(--color-neutral-50);color:var(--color-neutral-800);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background-color var(--duration-normal),color var(--duration-normal);}
+a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;}
+
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:rgba(255,255,255,.85);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border-bottom:1px solid var(--color-neutral-200);display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-5);z-index:100;}.topbar-left{display:flex;align-items:center;gap:var(--space-4);}.hamburger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-600);}.hamburger:hover{background:var(--color-neutral-100);}.topbar-logo{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body);font-weight:700;color:var(--color-neutral-900);}.topbar-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-500),#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#FFF;flex-shrink:0;}.topbar-logo .logo-icon svg{width:16px;height:16px;}.breadcrumb{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-caption);color:var(--color-neutral-400);}.breadcrumb .current{color:var(--color-neutral-600);font-weight:500;}.topbar-right{display:flex;align-items:center;gap:var(--space-1);}.topbar-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--radius-sm);color:var(--color-neutral-500);position:relative;}.topbar-btn:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}.topbar-btn svg{width:20px;height:20px;}.notification-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}.user-menu{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);cursor:pointer;border:none;background:none;color:var(--color-neutral-800);font-family:var(--font-sans);font-size:var(--text-body-s);}.user-menu:hover{background:var(--color-neutral-100);}.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:#FFF;font-size:13px;font-weight:600;flex-shrink:0;}.user-name{font-weight:500;white-space:nowrap;}
+.sidebar{position:fixed;top:var(--topbar-height);left:0;bottom:0;width:var(--sidebar-width);background:#FFFFFF;border-right:1px solid var(--color-neutral-200);display:flex;flex-direction:column;z-index:90;transition:width var(--duration-slow) var(--ease-out),background-color var(--duration-normal);overflow:hidden;}.sidebar.collapsed{width:var(--sidebar-collapsed);}.sidebar-nav{flex:1;padding:var(--space-3);display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;}.nav-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);transition:all var(--duration-fast);white-space:nowrap;cursor:pointer;width:100%;text-align:left;font-family:var(--font-sans);border:none;background:none;}.nav-item svg{width:20px;height:20px;flex-shrink:0;}.nav-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}.nav-item.active{background:var(--color-primary-50);color:var(--color-primary-600);box-shadow:inset 3px 0 0 var(--color-primary-500);}.nav-item .badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;background:var(--color-error-500);color:#FFF;font-size:11px;font-weight:600;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}.nav-divider{height:1px;background:var(--color-neutral-200);margin:var(--space-2) var(--space-3);}.sidebar-footer{padding:var(--space-3);border-top:1px solid var(--color-neutral-200);}.collapse-btn{display:flex;align-items:center;gap:var(--space-3);width:100%;padding:10px var(--space-3);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-500);cursor:pointer;white-space:nowrap;border:none;background:none;}.collapse-btn:hover{background:var(--color-neutral-100);}.collapse-btn svg{width:20px;height:20px;flex-shrink:0;}
+.main-content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:var(--space-6);min-height:calc(100vh - var(--topbar-height));transition:margin-left var(--duration-slow) var(--ease-out);display:flex;gap:var(--space-6);}.sidebar.collapsed ~ .main-content{margin-left:var(--sidebar-collapsed);}.content-primary{flex:1;min-width:0;}
+.page-header{margin-bottom:var(--space-5);}.page-header h1{font-size:var(--text-h2);font-weight:700;color:var(--color-neutral-900);}.page-header .subtitle{font-size:var(--text-body-s);color:var(--color-neutral-500);}
+
+.tab-row{display:flex;gap:var(--space-1);margin-bottom:var(--space-5);background:var(--color-neutral-100);border-radius:var(--radius-md);padding:4px;}
+.tab-btn{padding:8px 20px;border-radius:var(--radius-sm);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-500);border:none;background:none;transition:all var(--duration-fast);font-family:var(--font-sans);}.tab-btn:hover{color:var(--color-neutral-700);}.tab-btn.active{background:#FFFFFF;color:var(--color-primary-600);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+
+.eval-list{display:flex;flex-direction:column;gap:var(--space-3);}
+.eval-card{background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-card);transition:all var(--duration-normal);}.eval-card:hover{box-shadow:var(--shadow-card-hover);}
+.eval-card .eval-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3);flex-wrap:wrap;gap:var(--space-3);}
+.eval-card .eval-course{font-size:var(--text-h3);font-weight:700;color:var(--color-neutral-800);}
+.eval-card .eval-teacher{font-size:var(--text-body-s);color:var(--color-neutral-500);}
+.eval-card .eval-deadline{font-size:var(--text-caption);color:var(--color-error-500);font-weight:500;}
+.eval-card .eval-deadline.safe{color:var(--color-neutral-400);}
+.rating-row{display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-2);flex-wrap:wrap;}
+.rating-row .rating-label{font-size:var(--text-body-s);color:var(--color-neutral-600);min-width:100px;}
+.stars{display:flex;gap:2px;}.star{cursor:pointer;font-size:24px;color:var(--color-neutral-300);transition:all var(--duration-fast);}.star.active,.star:hover{color:var(--color-accent-500);}
+.btn-submit{padding:8px 24px;border-radius:var(--radius-sm);font-size:var(--text-body-s);font-weight:600;background:var(--color-primary-500);color:#FFF;border:none;cursor:pointer;transition:all var(--duration-fast);}.btn-submit:hover{background:var(--color-primary-600);box-shadow:0 4px 12px rgba(59,130,246,0.3);}
+.btn-submit:disabled{background:var(--color-neutral-300);cursor:not-allowed;box-shadow:none;}
+
+.status-badge{padding:3px 10px;border-radius:var(--radius-full);font-size:11px;font-weight:600;}
+.status-badge--pending{background:var(--color-warning-100);color:var(--color-accent-500);}
+.status-badge--done{background:var(--color-success-100);color:var(--color-success-500);}
+
+.right-panel{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:var(--space-5);}
+.panel-card{background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-card);}.panel-card:hover{box-shadow:var(--shadow-card-hover);}.panel-card h3{font-size:var(--text-body);font-weight:600;color:var(--color-neutral-800);margin-bottom:var(--space-4);}
+.progress-ring{text-align:center;padding:var(--space-4);}.progress-ring .big{font-size:40px;font-weight:700;color:var(--color-primary-600);}.progress-ring .label{font-size:var(--text-caption);color:var(--color-neutral-500);margin-top:var(--space-1);}
+
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:85;opacity:0;transition:opacity var(--duration-normal);}.sidebar-overlay.show{display:block;opacity:1;}
+body.dark{--color-neutral-50:#0F172A;--color-neutral-100:#1E293B;--color-neutral-200:#334155;--color-neutral-300:#475569;--color-neutral-400:#64748B;--color-neutral-500:#94A3B8;--color-neutral-600:#CBD5E1;--color-neutral-700:#E2E8F0;--color-neutral-800:#F1F5F9;--color-neutral-900:#F8FAFC;--color-primary-50:rgba(59,130,246,0.15);}body.dark .topbar{background:rgba(15,23,42,.85);}body.dark .sidebar,body.dark .eval-card,body.dark .panel-card{background:#1E293B;}body.dark .tab-btn.active{background:#334155;color:#93C5FD;}
+@media(max-width:1200px){.right-panel{display:none;}}
+@media(max-width:1024px){.sidebar{width:var(--sidebar-collapsed);}.sidebar .nav-item span,.sidebar .nav-item .badge,.sidebar .nav-divider,.sidebar .collapse-btn span{display:none;}.sidebar .nav-item{justify-content:center;padding:10px;}.sidebar:not(.mobile-open) .collapse-btn{display:none;}.main-content{margin-left:var(--sidebar-collapsed)!important;}.hamburger{display:flex;}}
+@media(max-width:768px){.sidebar{transform:translateX(-100%);width:var(--sidebar-width);z-index:95;}.sidebar.mobile-open{transform:translateX(0);}.sidebar.mobile-open .nav-item{justify-content:flex-start;padding:10px var(--space-3);}.sidebar.mobile-open .nav-item span,.sidebar.mobile-open .nav-item .badge,.sidebar.mobile-open .nav-divider,.sidebar.mobile-open .collapse-btn span{display:inline;}.main-content{margin-left:0!important;padding:var(--space-3);flex-direction:column;}.user-name{display:none;}.breadcrumb{display:none;}}
+
+
+.user-menu-wrap{position:relative;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:210px;background:#FFFFFF;border:1px solid var(--color-neutral-200);border-radius:var(--radius-lg);box-shadow:0 10px 40px rgba(15,23,42,0.14);padding:var(--space-2);z-index:200;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s var(--ease-out);}
+.user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-item{display:flex;align-items:center;gap:var(--space-3);padding:10px var(--space-3);border-radius:var(--radius-md);font-size:var(--text-body-s);font-weight:500;color:var(--color-neutral-600);cursor:pointer;transition:all var(--duration-fast);border:none;background:none;width:100%;text-align:left;font-family:var(--font-sans);}
+.dropdown-item:hover{background:var(--color-neutral-100);color:var(--color-neutral-800);}
+.dropdown-item svg{width:18px;height:18px;color:var(--color-neutral-400);flex-shrink:0;}
+.dropdown-item.danger{color:var(--color-error-500);}.dropdown-item.danger:hover{background:var(--color-error-100);}
+.dropdown-divider{height:1px;background:var(--color-neutral-100);margin:var(--space-1) 0;}
+body.dark .user-dropdown{background:#1E293B;border-color:var(--color-neutral-200);}
+body.dark .dropdown-item:hover{background:rgba(255,255,255,.06);}
+</style>
+</head>
+<body>
+
+<!-- ====== 顶部导航栏 ====== -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="菜单"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <a href="index.html" class="topbar-logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg></div>教务系统</a>
+    <nav class="breadcrumb"><a href="index.html">首页</a><span>/</span><span class="current">教学评价</span></nav>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="darkModeToggle" title="暗黑模式"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" id="darkIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <a href="notifications.html" class="topbar-btn" style="position:relative;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notification-count" id="topNotifCount">3</span></a>
+    <div class="user-menu-wrap"><button class="user-menu" id="userMenuBtn"><div class="user-avatar">李</div><span class="user-name">李小宇</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="personal.html" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人信息</a>
+        <a href="#" class="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a href="login.html" class="dropdown-item danger"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ====== 侧边栏导航 ====== -->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>首页仪表盘</span></a>
+    <a href="schedule.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>课表</span></a>
+    <a href="course-selection.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>选课中心</span></a>
+    <a href="grades.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>成绩查询</span></a>
+    <a href="notifications.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>校园通知</span><span class="badge" id="sidebarBadge">3</span></a>
+    <a href="exams.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span>考试安排</span></a>
+    <div class="nav-divider"></div>
+    <a href="training.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 4 3 6 3s6-1 6-3v-5"/></svg><span>培养方案</span></a>
+    <a href="payment.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>缴费查询</span></a>
+    <a href="resources.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>教学资源</span></a>
+    <button class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>教学评价</span></button>
+    <a href="settings.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+  </nav>
+  <div class="sidebar-footer"><button class="collapse-btn" id="collapseBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>折叠菜单</span></button></div>
+</aside>
+<!-- 移动端侧边栏遮罩 -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ====== 主内容区域 ====== -->
+<div class="main-content">
+  <div class="content-primary">
+    <div class="page-header"><h1>📝 教学评价</h1><p class="subtitle">2025-2026 第二学期 · 完成评教后方可查看成绩和选课</p></div>
+
+    <div class="tab-row" id="evalTabs">
+      <button class="tab-btn active" data-tab="pending">待评价 (3)</button>
+      <button class="tab-btn" data-tab="done">已评价 (4)</button>
+    </div>
+
+    <div class="eval-list" id="evalList"></div>
+  </div>
+
+  <!-- ====== 右侧面板 ====== -->
+<div class="right-panel">
+    <div class="panel-card"><h3>📊 评教进度</h3><div class="progress-ring"><div class="big">3/7</div><div class="label">剩余 3 门待评价</div></div></div>
+    <div class="panel-card"><h3>⏰ 截止提醒</h3><div style="font-size:var(--text-body-s);color:var(--color-neutral-600);">
+      <div style="margin-bottom:var(--space-2);">📅 评教截止：<strong style="color:var(--color-error-500);">2026年6月27日（本周六）</strong></div>
+      <div style="color:var(--color-neutral-500);font-size:var(--text-caption);">⚠️ 未完成评教将无法查看本学期成绩及进行下学期选课</div>
+    </div></div>
+  </div>
+</div>
+
+<script>
+var PENDING=[{id:1,course:'算法设计与分析',teacher:'李建国 教授',deadline:'6月27日'},{id:2,course:'机器学习导论',teacher:'赵强 讲师',deadline:'6月27日'},{id:3,course:'学术英语写作',teacher:'王芳 副教授',deadline:'6月27日'}];
+var DONE=[{id:4,course:'计算机网络',teacher:'周明 副教授'},{id:5,course:'软件工程',teacher:'郑远 教授'},{id:6,course:'概率论与数理统计',teacher:'陈明 副教授'},{id:7,course:'中国书法鉴赏',teacher:'黄明 教授'}];
+var RATINGS=['教学态度','教学内容','教学方法','教学效果','总体评分'];
+
+// Persist evaluation state
+// ==== SAVE EVAL: persists DONE and PENDING IDs to localStorage ====
+  function saveEvalState(){
+  localStorage.setItem('evalDONE', JSON.stringify(DONE.map(function(e){return e.id;})));
+  localStorage.setItem('evalPENDING', JSON.stringify(PENDING.map(function(e){return e.id;})));
+}
+// ==== RESTORE EVAL: reads evaluation state from localStorage on page load ====
+  function restoreEvalState(){
+  try{
+    var doneIds=JSON.parse(localStorage.getItem('evalDONE')||'[4,5,6,7]');
+    var pendingIds=JSON.parse(localStorage.getItem('evalPENDING')||'[1,2,3]');
+    var all=[{id:1,course:'算法设计与分析',teacher:'李建国 教授',deadline:'6月27日'},{id:2,course:'机器学习导论',teacher:'赵强 讲师',deadline:'6月27日'},{id:3,course:'学术英语写作',teacher:'王芳 副教授',deadline:'6月27日'},{id:4,course:'计算机网络',teacher:'周明 副教授'},{id:5,course:'软件工程',teacher:'郑远 教授'},{id:6,course:'概率论与数理统计',teacher:'陈明 副教授'},{id:7,course:'中国书法鉴赏',teacher:'黄明 教授'}];
+    DONE=doneIds.map(function(id){return all.find(function(a){return a.id===id;});}).filter(Boolean);
+    PENDING=pendingIds.map(function(id){return all.find(function(a){return a.id===id;});}).filter(Boolean);
+  }catch(e){}
+}
+
+// ==== RENDER EVALUATIONS: renders pending/done evaluation cards with star rating interaction ====
+  function renderEvaluations(tab){
+  var list=document.getElementById('evalList');
+  if(tab==='done'){
+    list.innerHTML=DONE.map(function(e){return'<div class="eval-card"><div class="eval-top"><div><div class="eval-course">'+e.course+'</div><div class="eval-teacher">'+e.teacher+'</div></div><span class="status-badge status-badge--done">✅ 已评价</span></div>'+RATINGS.map(function(r){return'<div class="rating-row"><span class="rating-label">'+r+'</span><div class="stars">'+'★★★★★'.split('').map(function(_,i){return'<span class="star active">★</span>';}).join('')+'</div></div>';}).join('')+'</div>';}).join('');
+  }else{
+    list.innerHTML=PENDING.map(function(e){return'<div class="eval-card" data-id="'+e.id+'"><div class="eval-top"><div><div class="eval-course">'+e.course+'</div><div class="eval-teacher">'+e.teacher+'</div></div><div><span class="status-badge status-badge--pending">⏳ 待评价</span><span class="eval-deadline" style="margin-left:8px;">截止 '+e.deadline+'</span></div></div>'+RATINGS.map(function(r,i){return'<div class="rating-row"><span class="rating-label">'+r+'</span><div class="stars" data-rating="'+i+'">'+[1,2,3,4,5].map(function(s){return'<span class="star" data-star="'+s+'">★</span>';}).join('')+'</div></div>';}).join('')+'<div style="margin-top:var(--space-4);display:flex;justify-content:flex-end;"><button class="btn-submit" disabled>提交评价</button></div></div>';}).join('');
+    list.querySelectorAll('.eval-card[data-id]').forEach(function(card){
+      var ratings={};
+      card.querySelectorAll('.stars').forEach(function(starGroup){
+        starGroup.addEventListener('click',function(e){var star=e.target.closest('.star');if(!star)return;var val=parseInt(star.dataset.star);var stars=this.querySelectorAll('.star');stars.forEach(function(s,i){s.classList.toggle('active',i<val);});ratings[this.dataset.rating]=val;var allRated=Object.keys(ratings).length===RATINGS.length;card.querySelector('.btn-submit').disabled=!allRated;});
+      });
+      card.querySelector('.btn-submit').addEventListener('click',function(){
+        var course=PENDING.find(function(p){return p.id===parseInt(card.dataset.id);});
+        DONE.push({id:course.id,course:course.course,teacher:course.teacher});
+        PENDING=PENDING.filter(function(p){return p.id!==course.id;});
+        saveEvalState();
+        updateTabCounts();
+        renderEvaluations('pending');
+      });
+    });
+  }
+}
+
+function updateTabCounts(){
+  document.querySelectorAll('.tab-btn')[0].textContent='待评价 ('+PENDING.length+')';
+  document.querySelectorAll('.tab-btn')[1].textContent='已评价 ('+DONE.length+')';
+  document.querySelector('.big').textContent=PENDING.length+'/7';
+}
+
+document.getElementById('evalTabs').addEventListener('click',function(e){var tab=e.target.closest('.tab-btn');if(!tab)return;document.querySelectorAll('.tab-btn').forEach(function(t){t.classList.remove('active');});tab.classList.add('active');renderEvaluations(tab.dataset.tab);});
+restoreEvalState();
+renderEvaluations('pending');
+
+var sidebar=document.getElementById('sidebar');document.getElementById('collapseBtn').addEventListener('click',function(){sidebar.classList.toggle('collapsed');});
+var hamburger=document.getElementById('hamburgerBtn'),overlay=document.getElementById('sidebarOverlay');function closeSidebar(){sidebar.classList.remove('mobile-open');overlay.classList.remove('show');}
+hamburger.addEventListener('click',function(){sidebar.classList.contains('mobile-open')?closeSidebar():(sidebar.classList.add('mobile-open'),overlay.classList.add('show'));});overlay.addEventListener('click',closeSidebar);
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(item){item.addEventListener('click',function(){if(window.innerWidth<=768)closeSidebar();});});
+var darkToggle=document.getElementById('darkModeToggle'),darkIcon=document.getElementById('darkIcon');function setDarkMode(on){document.body.classList.toggle('dark',on);darkIcon.innerHTML=on?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';localStorage.setItem('theme',on?'dark':'light');}darkToggle.addEventListener('click',function(){setDarkMode(!document.body.classList.contains('dark'));});if(localStorage.getItem('theme')==='dark')setDarkMode(true);
+(function(){var c=parseInt(localStorage.getItem('unreadCount')||'3');[document.getElementById('topNotifCount'),document.getElementById('sidebarBadge')].forEach(function(el){if(!el)return;el.textContent=c;el.style.display=c>0?'':'none';});})();
+var um=document.getElementById("userMenuBtn"),ud=document.getElementById("userDropdown");if(um&&ud){um.addEventListener("click",function(e){e.stopPropagation();ud.classList.toggle("show");});document.addEventListener("click",function(){ud.classList.remove("show");});}var savedName=localStorage.getItem("userName");if(savedName){var un=document.querySelector(".user-name");if(un)un.textContent=savedName;var av=document.querySelector(".user-avatar");if(av)av.textContent=savedName.charAt(0);}</script>
+<script src="_shared.js"></script>
+</body>
+</html>
